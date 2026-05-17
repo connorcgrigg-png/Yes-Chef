@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { extractRecipeFromImages, extractRecipeFromText } from '@/lib/claude'
+import { extractRecipeFromImages, extractRecipeFromPDF } from '@/lib/claude'
 import { createClient } from '@/lib/supabase/server'
 
 export const maxDuration = 60
@@ -20,15 +20,8 @@ export async function POST(request: NextRequest) {
     let extracted: object
 
     if (fileType === 'application/pdf') {
-      // Convert PDF pages to images using sharp + pdf processing
-      // We send raw PDF content as base64 and let Claude handle extraction from the text
-      // For a proper PDF-to-image pipeline, pdf2pic would run server-side
       const base64 = buffer.toString('base64')
-      // Try text extraction first via Claude's document understanding
-      extracted = await extractRecipeFromText(
-        `[PDF content, base64 encoded - extract the recipe]: ${base64.slice(0, 100)}...`,
-        'PDF recipe document'
-      )
+      extracted = await extractRecipeFromPDF(base64)
     } else if (fileType.startsWith('image/')) {
       const base64 = buffer.toString('base64')
       extracted = await extractRecipeFromImages([base64])

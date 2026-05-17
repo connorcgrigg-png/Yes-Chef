@@ -41,17 +41,13 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
 
     if (activeCollection) {
       result = result.filter(r =>
-        (r as Recipe & { recipe_collections?: { collection_id: string }[] }).recipe_collections?.some(
-          rc => rc.collection_id === activeCollection
-        )
+        r.recipe_collections?.some(rc => rc.collection_id === activeCollection)
       )
     }
 
     if (activeTag) {
       result = result.filter(r =>
-        (r as Recipe & { recipe_tags?: { tag_id: string }[] }).recipe_tags?.some(
-          rt => rt.tag_id === activeTag
-        )
+        r.recipe_tags?.some(rt => rt.tag_id === activeTag)
       )
     }
 

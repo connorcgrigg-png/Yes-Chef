@@ -20,11 +20,11 @@ export interface Recipe {
   total_time_minutes?: number
   ingredients: Ingredient[]
   instructions: Instruction[]
-  tags: string[]
-  collection_ids: string[]
   notes?: string
   created_at: string
   updated_at: string
+  recipe_tags?: { tag_id: string; tags?: { name: string; color: string } }[]
+  recipe_collections?: { collection_id: string }[]
 }
 
 export interface Ingredient {

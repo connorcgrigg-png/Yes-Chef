@@ -35,13 +35,26 @@ export async function POST(request: NextRequest) {
   // Apply updates to database
   for (const update of updates) {
     if (update.action === 'add') {
-      await supabase.from('pantry_items').upsert({
-        user_id: user.id,
-        name: update.name.toLowerCase(),
-        quantity: update.quantity,
-        unit: update.unit,
-        category: update.category ?? 'other',
-      }, { onConflict: 'user_id,name' })
+      const { data: existing } = await supabase
+        .from('pantry_items')
+        .select('id')
+        .eq('user_id', user.id)
+        .ilike('name', update.name)
+        .maybeSingle()
+
+      if (existing) {
+        await supabase.from('pantry_items')
+          .update({ quantity: update.quantity, unit: update.unit, category: update.category ?? 'other' })
+          .eq('id', existing.id)
+      } else {
+        await supabase.from('pantry_items').insert({
+          user_id: user.id,
+          name: update.name.toLowerCase(),
+          quantity: update.quantity,
+          unit: update.unit,
+          category: update.category ?? 'other',
+        })
+      }
     } else if (update.action === 'remove') {
       await supabase.from('pantry_items')
         .delete()

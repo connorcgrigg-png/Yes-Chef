@@ -62,7 +62,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
     router.push('/dashboard')
   }
 
-  const recipeTags = (recipe as Recipe & { recipe_tags?: { tag_id: string; tags: Tag }[] }).recipe_tags ?? []
+  const recipeTags = recipe.recipe_tags ?? []
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">

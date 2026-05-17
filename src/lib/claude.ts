@@ -58,6 +58,66 @@ ${text}`,
   return JSON.parse(jsonMatch[0])
 }
 
+export async function extractRecipeFromPDF(pdfBase64: string): Promise<object> {
+  const message = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 4096,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          {
+            type: 'document',
+            source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 },
+          } as any,
+          {
+            type: 'text',
+            text: `Extract the recipe from this PDF and return it as JSON.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "title": "string",
+  "description": "string or null",
+  "feeds_people": number or null,
+  "prep_time_minutes": number or null,
+  "cook_time_minutes": number or null,
+  "total_time_minutes": number or null,
+  "ingredients": [
+    {
+      "name": "string",
+      "quantity": "string",
+      "unit": "string or null",
+      "notes": "string or null",
+      "is_primary": boolean
+    }
+  ],
+  "instructions": [
+    {
+      "step_number": number,
+      "text": "string"
+    }
+  ],
+  "suggested_tags": ["string"]
+}
+
+For "is_primary": mark main, expensive, or centerpiece ingredients as true. Common pantry staples (salt, pepper, oil, basic spices) as false.
+For "feeds_people": number of people the dish feeds, or null if unclear.`,
+          },
+        ],
+      },
+    ],
+  })
+
+  const content = message.content[0]
+  if (content.type !== 'text') throw new Error('Unexpected response type from Claude')
+
+  const jsonMatch = content.text.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) throw new Error('No JSON found in Claude response')
+
+  return JSON.parse(jsonMatch[0])
+}
+
 export async function extractRecipeFromImages(imageBase64Array: string[]): Promise<object> {
   const imageContent = imageBase64Array.map((b64) => ({
     type: 'image' as const,

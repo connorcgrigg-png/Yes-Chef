@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     .select(`
       *,
       recipe_collections(collection_id),
-      recipe_tags(tag_id)
+      recipe_tags(tag_id, tags(name, color))
     `)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
