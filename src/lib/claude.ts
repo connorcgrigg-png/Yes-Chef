@@ -123,25 +123,8 @@ For "feeds_people": number of people the dish feeds, or null if unclear.`,
   return JSON.parse(jsonMatch[0])
 }
 
-type AnthropicContentBlock =
-  | { type: 'text'; text: string }
-  | { type: 'image'; source: { type: 'base64'; media_type: string; data: string } }
-
-type ChatContent = string | Array<{ type: 'text'; text: string } | { type: 'image'; data: string; mediaType: string }>
-
-function toAnthropicContent(content: ChatContent): string | AnthropicContentBlock[] {
-  if (typeof content === 'string') return content
-  return content.map(block => {
-    if (block.type === 'text') return { type: 'text' as const, text: block.text }
-    return {
-      type: 'image' as const,
-      source: { type: 'base64' as const, media_type: block.mediaType, data: block.data },
-    }
-  })
-}
-
 export async function processPantryChat(
-  messages: Array<{ role: 'user' | 'assistant'; content: ChatContent }>,
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
   currentPantry: Array<{ name: string; quantity?: string; unit?: string }>
 ): Promise<{ message: string; updates: PantryUpdate[] }> {
   const pantryList = currentPantry.length > 0
@@ -168,7 +151,7 @@ Always respond with valid JSON in this format:
 
 If no pantry changes are needed (e.g. user is just asking a question), return an empty updates array.
 Categories: "produce", "protein", "dairy", "grains", "pantry", "spices", "frozen", "other"`,
-    messages: messages.map(m => ({ role: m.role, content: toAnthropicContent(m.content) })),
+    messages,
   })
 
   const content = response.content[0]
