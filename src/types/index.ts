@@ -80,7 +80,11 @@ export interface RecipeMatch {
   match_score: number  // weighted by primary/expensive ingredients
 }
 
+export type ChatContentBlock =
+  | { type: 'text'; text: string }
+  | { type: 'image'; data: string; mediaType: string }
+
 export interface ChatMessage {
   role: 'user' | 'assistant'
-  content: string
+  content: string | ChatContentBlock[]
 }

@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, Loader2, Mic } from 'lucide-react'
+import { Send, Loader2, Mic, Paperclip, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { ChatMessage, PantryItem } from '@/types'
+import type { ChatMessage, ChatContentBlock, PantryItem } from '@/types'
 
 interface PantryChatProps {
   onPantryUpdated: (items: PantryItem[]) => void
@@ -14,13 +14,15 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: "Hey! Tell me what you have in your fridge and pantry. You can say something like \"I have chicken breasts, garlic, olive oil, and some wilting spinach\" — I'll keep track for you.",
+      content: "Hey! Tell me what you have in your fridge and pantry. You can say something like \"I have chicken breasts, garlic, olive oil, and some wilting spinach\" — or snap a photo of your fridge and I'll figure it out.",
     },
   ])
   const [input, setInput] = useState('')
+  const [attachedImage, setAttachedImage] = useState<{ data: string; mediaType: string; previewUrl: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [listening, setListening] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
 
@@ -28,12 +30,51 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  function attachImageFile(file: File) {
+    if (!file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      const base64 = dataUrl.split(',')[1]
+      setAttachedImage({ data: base64, mediaType: file.type, previewUrl: dataUrl })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function handlePaste(e: React.ClipboardEvent) {
+    const imageItem = Array.from(e.clipboardData.items).find(item => item.type.startsWith('image/'))
+    if (imageItem) {
+      const file = imageItem.getAsFile()
+      if (file) attachImageFile(file)
+    }
+  }
+
+  function clearAttachment() {
+    setAttachedImage(null)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
   async function send(text: string) {
-    if (!text.trim() || loading) return
-    const userMessage: ChatMessage = { role: 'user', content: text }
+    const hasText = text.trim().length > 0
+    const hasImage = attachedImage !== null
+    if ((!hasText && !hasImage) || loading) return
+
+    let userContent: string | ChatContentBlock[]
+    if (hasImage) {
+      const blocks: ChatContentBlock[] = [
+        { type: 'image', data: attachedImage.data, mediaType: attachedImage.mediaType },
+      ]
+      if (hasText) blocks.push({ type: 'text', text: text.trim() })
+      userContent = blocks
+    } else {
+      userContent = text.trim()
+    }
+
+    const userMessage: ChatMessage = { role: 'user', content: userContent }
     const newMessages = [...messages, userMessage]
     setMessages(newMessages)
     setInput('')
+    clearAttachment()
     setLoading(true)
 
     try {
@@ -74,6 +115,27 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
     setListening(true)
   }
 
+  function renderMessageContent(content: ChatMessage['content']) {
+    if (typeof content === 'string') return <span>{content}</span>
+    return (
+      <>
+        {content.map((block, i) => {
+          if (block.type === 'text') return <span key={i}>{block.text}</span>
+          return (
+            <img
+              key={i}
+              src={`data:${block.mediaType};base64,${block.data}`}
+              alt="attached"
+              className="mt-1 max-h-48 rounded-lg object-contain"
+            />
+          )
+        })}
+      </>
+    )
+  }
+
+  const canSend = (input.trim().length > 0 || attachedImage !== null) && !loading
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto space-y-4 p-4">
@@ -87,7 +149,7 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
                   : 'bg-stone-100 text-stone-800 rounded-bl-sm'
               )}
             >
-              {msg.content}
+              {renderMessageContent(msg.content)}
             </div>
           </div>
         ))}
@@ -101,7 +163,18 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-stone-100 p-3">
+      <div className="border-t border-stone-100 p-3 space-y-2">
+        {attachedImage && (
+          <div className="relative inline-block">
+            <img src={attachedImage.previewUrl} alt="attachment preview" className="h-20 rounded-lg object-contain border border-stone-200" />
+            <button
+              onClick={clearAttachment}
+              className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-stone-700 text-white hover:bg-stone-900"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <button
             onClick={startVoice}
@@ -114,14 +187,28 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
           >
             <Mic className="h-4 w-4" />
           </button>
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-stone-200 text-stone-400 hover:text-stone-600 hover:border-stone-300 transition-colors"
+          >
+            <Paperclip className="h-4 w-4" />
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) attachImageFile(f) }}
+          />
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send(input)}
-            placeholder="I have eggs, butter, lemons..."
+            onPaste={handlePaste}
+            placeholder="I have eggs, butter, lemons... or paste a photo"
             className="flex-1 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300"
           />
-          <Button size="icon" onClick={() => send(input)} disabled={!input.trim() || loading}>
+          <Button size="icon" onClick={() => send(input)} disabled={!canSend}>
             <Send className="h-4 w-4" />
           </Button>
         </div>
