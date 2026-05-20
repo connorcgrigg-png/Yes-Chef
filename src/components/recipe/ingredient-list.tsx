@@ -133,7 +133,7 @@ export function IngredientList({ recipe, onChangeIngredients, editable }: Ingred
     <div>
       {/* Serving scaler */}
       <div className="mb-6 flex items-center gap-4">
-        <span className="text-sm font-medium text-stone-600">Feeds</span>
+        <span className="text-sm font-medium text-stone-600">I want to feed</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setServings(Math.max(1, servings - 1))}

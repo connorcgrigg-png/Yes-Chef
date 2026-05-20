@@ -226,7 +226,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
         {editingFeeds ? (
           <div className="flex items-center gap-1.5">
             <Users className="h-4 w-4" />
-            <span>Feeds</span>
+            <span>Base recipe actually feeds</span>
             <input
               autoFocus
               type="number"
@@ -252,7 +252,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
             onClick={() => setEditingFeeds(true)}
           >
             <Users className="h-4 w-4" />
-            Feeds {recipe.feeds_people}
+            Base recipe actually feeds {recipe.feeds_people} people
           </button>
         )}
 
