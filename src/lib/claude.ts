@@ -61,7 +61,7 @@ ${text}`,
 export async function extractRecipeFromPDF(pdfBase64: string): Promise<object> {
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 4096,
+    max_tokens: 8192,
     messages: [
       {
         role: 'user',
@@ -73,9 +73,7 @@ export async function extractRecipeFromPDF(pdfBase64: string): Promise<object> {
           } as any,
           {
             type: 'text',
-            text: `Extract the recipe from this PDF and return it as JSON.
-
-Return ONLY valid JSON with this exact structure:
+            text: `Extract the complete recipe from this PDF. You MUST include every single ingredient and every instruction step — do not skip or summarize any of them. Return ONLY valid JSON with this exact structure, no other text:
 {
   "title": "string",
   "description": "string or null",
@@ -101,8 +99,12 @@ Return ONLY valid JSON with this exact structure:
   "suggested_tags": ["string"]
 }
 
-For "is_primary": mark main, expensive, or centerpiece ingredients as true. Common pantry staples (salt, pepper, oil, basic spices) as false.
-For "feeds_people": number of people the dish feeds, or null if unclear.`,
+Rules:
+- "ingredients" must never be an empty array if the recipe has ingredients
+- "instructions" must never be an empty array if the recipe has steps
+- "quantity" must always be a string (e.g. "2", "1/2", "3")
+- "is_primary": true for main/expensive/centerpiece ingredients; false for pantry staples (salt, pepper, oil, basic spices)
+- "feeds_people": number of servings/people, or null if not stated`,
           },
         ],
       },
@@ -115,7 +117,13 @@ For "feeds_people": number of people the dish feeds, or null if unclear.`,
   const jsonMatch = content.text.match(/\{[\s\S]*\}/)
   if (!jsonMatch) throw new Error('No JSON found in Claude response')
 
-  return JSON.parse(jsonMatch[0])
+  const parsed = JSON.parse(jsonMatch[0])
+
+  if (!Array.isArray(parsed.ingredients) || parsed.ingredients.length === 0) {
+    throw new Error('Could not extract ingredients from this PDF. Try a text-based PDF rather than a scanned image.')
+  }
+
+  return parsed
 }
 
 export async function extractRecipeFromImages(imageBase64Array: string[]): Promise<object> {
