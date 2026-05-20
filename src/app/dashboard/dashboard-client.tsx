@@ -243,7 +243,7 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
               )}
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 [grid-auto-rows:1fr]">
               {filtered.map(recipe => (
                 <RecipeCard key={recipe.id} recipe={recipe} />
               ))}
