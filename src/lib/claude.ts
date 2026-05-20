@@ -114,13 +114,17 @@ Rules:
   const content = message.content[0]
   if (content.type !== 'text') throw new Error('Unexpected response type from Claude')
 
+  if (message.stop_reason === 'max_tokens') {
+    throw new Error('This PDF is too large to process in one pass. Try uploading a single page as a photo instead.')
+  }
+
   const jsonMatch = content.text.match(/\{[\s\S]*\}/)
   if (!jsonMatch) throw new Error('No JSON found in Claude response')
 
   const parsed = JSON.parse(jsonMatch[0])
 
   if (!Array.isArray(parsed.ingredients) || parsed.ingredients.length === 0) {
-    throw new Error('Could not extract ingredients from this PDF. Try a text-based PDF rather than a scanned image.')
+    throw new Error('Could not extract ingredients from this PDF. Try uploading a photo of the recipe page instead.')
   }
 
   return parsed
