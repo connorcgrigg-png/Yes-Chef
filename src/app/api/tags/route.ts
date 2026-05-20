@@ -24,18 +24,20 @@ export async function POST(request: NextRequest) {
   const { name } = await request.json()
   if (!name?.trim()) return NextResponse.json({ error: 'Name required' }, { status: 400 })
 
+  const normalized = name.trim().toLowerCase()
+
   const { data: existing } = await supabase
     .from('tags')
     .select('*')
     .eq('user_id', user.id)
-    .eq('name', name.trim())
+    .eq('name', normalized)
     .maybeSingle()
 
   if (existing) return NextResponse.json({ tag: existing })
 
   const { data: newTag, error } = await supabase
     .from('tags')
-    .insert({ user_id: user.id, name: name.trim() })
+    .insert({ user_id: user.id, name: normalized })
     .select()
     .single()
 

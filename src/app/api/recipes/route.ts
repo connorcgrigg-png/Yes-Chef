@@ -97,19 +97,20 @@ export async function POST(request: NextRequest) {
   const allTagIds = [...tag_ids]
   if (suggested_tags.length > 0) {
     for (const tagName of suggested_tags) {
+      const normalized = tagName.trim().toLowerCase()
       const { data: existing } = await supabase
         .from('tags')
         .select('id')
         .eq('user_id', user.id)
-        .eq('name', tagName)
-        .single()
+        .eq('name', normalized)
+        .maybeSingle()
 
       if (existing) {
         allTagIds.push(existing.id)
       } else {
         const { data: newTag } = await supabase
           .from('tags')
-          .insert({ user_id: user.id, name: tagName })
+          .insert({ user_id: user.id, name: normalized })
           .select('id')
           .single()
         if (newTag) allTagIds.push(newTag.id)
