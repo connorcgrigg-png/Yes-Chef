@@ -69,7 +69,9 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
     router.push('/dashboard')
   }
 
-  const recipeTags = recipe.recipe_tags ?? []
+  const recipeTags = [...(recipe.recipe_tags ?? [])].sort((a, b) =>
+    new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  )
 
   const suggestions = availableTags.filter(t =>
     !recipeTags.some(rt => rt.tag_id === t.id) &&

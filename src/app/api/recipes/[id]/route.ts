@@ -9,7 +9,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 
   const { data, error } = await supabase
     .from('recipes')
-    .select(`*, recipe_collections(collection_id), recipe_tags(tag_id, tags(name, color))`)
+    .select(`*, recipe_collections(collection_id), recipe_tags(tag_id, created_at, tags(name, color))`)
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
@@ -45,17 +45,24 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   if (tag_ids !== undefined) {
-    await supabase.from('recipe_tags').delete().eq('recipe_id', id)
-    if (tag_ids.length > 0) {
-      await supabase.from('recipe_tags').insert(
-        tag_ids.map((tid: string) => ({ recipe_id: id, tag_id: tid }))
-      )
+    const { data: existing } = await supabase.from('recipe_tags').select('tag_id').eq('recipe_id', id)
+    const existingIds = new Set((existing ?? []).map((r: { tag_id: string }) => r.tag_id))
+    const newIds = new Set(tag_ids as string[])
+
+    const toDelete = [...existingIds].filter(tid => !newIds.has(tid))
+    if (toDelete.length > 0) {
+      await supabase.from('recipe_tags').delete().eq('recipe_id', id).in('tag_id', toDelete)
+    }
+
+    const toAdd = (tag_ids as string[]).filter(tid => !existingIds.has(tid))
+    if (toAdd.length > 0) {
+      await supabase.from('recipe_tags').insert(toAdd.map(tid => ({ recipe_id: id, tag_id: tid })))
     }
   }
 
   const { data: updated, error: fetchError } = await supabase
     .from('recipes')
-    .select('*, recipe_collections(collection_id), recipe_tags(tag_id, tags(name, color))')
+    .select('*, recipe_collections(collection_id), recipe_tags(tag_id, created_at, tags(name, color))')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
