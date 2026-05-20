@@ -9,7 +9,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 
   const { data, error } = await supabase
     .from('recipes')
-    .select(`*, recipe_collections(collection_id), recipe_tags(tag_id, created_at, tags(name, color))`)
+    .select(`*, recipe_collections(collection_id), recipe_tags(tag_id, tags(name, color))`)
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
@@ -62,7 +62,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { data: updated, error: fetchError } = await supabase
     .from('recipes')
-    .select('*, recipe_collections(collection_id), recipe_tags(tag_id, created_at, tags(name, color))')
+    .select('*, recipe_collections(collection_id), recipe_tags(tag_id, tags(name, color))')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()

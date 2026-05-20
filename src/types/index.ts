@@ -23,7 +23,7 @@ export interface Recipe {
   notes?: string
   created_at: string
   updated_at: string
-  recipe_tags?: { tag_id: string; created_at: string; tags?: { name: string; color: string } }[]
+  recipe_tags?: { tag_id: string; tags?: { name: string; color: string } }[]
   recipe_collections?: { collection_id: string }[]
 }
 
