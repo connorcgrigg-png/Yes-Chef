@@ -56,11 +56,8 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
     if (!isNaN(n) && n !== recipe.feeds_people) await patch({ feeds_people: n })
   }
 
-  async function updateIngredient(id: string, quantity: string, unit?: string) {
-    const updated = recipe.ingredients.map(ing =>
-      ing.id === id ? { ...ing, quantity, unit } : ing
-    )
-    await patch({ ingredients: updated })
+  async function updateIngredients(ingredients: Ingredient[]) {
+    await patch({ ingredients })
   }
 
   async function deleteRecipe() {
@@ -284,7 +281,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
       <div className="grid gap-10 md:grid-cols-[2fr_3fr]">
         <section>
           <h2 className="mb-4 text-lg font-semibold text-stone-900">Ingredients</h2>
-          <IngredientList recipe={recipe} onUpdateIngredient={updateIngredient} editable />
+          <IngredientList recipe={recipe} onChangeIngredients={updateIngredients} editable />
         </section>
 
         <section>
@@ -302,12 +299,17 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
         </section>
       </div>
 
-      {recipe.notes && (
-        <div className="mt-10 rounded-xl border border-stone-100 bg-stone-50 p-4">
-          <h3 className="mb-1 text-sm font-semibold text-stone-600">Notes</h3>
-          <p className="text-sm text-stone-600 leading-relaxed">{recipe.notes}</p>
-        </div>
-      )}
+      <div className="mt-10 rounded-xl border border-stone-100 bg-stone-50 p-4">
+        <h3 className="mb-2 text-sm font-semibold text-stone-600">Notes</h3>
+        <textarea
+          value={recipe.notes ?? ''}
+          onChange={e => setRecipe(r => ({ ...r, notes: e.target.value }))}
+          onBlur={e => patch({ notes: e.target.value })}
+          placeholder="Add any notes about this recipe…"
+          rows={3}
+          className="w-full resize-none bg-transparent text-sm text-stone-600 leading-relaxed placeholder:text-stone-300 focus:outline-none"
+        />
+      </div>
     </div>
   )
 }
