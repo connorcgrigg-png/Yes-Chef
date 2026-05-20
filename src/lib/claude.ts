@@ -43,6 +43,14 @@ For "is_primary": mark ingredients as true if they are the main, expensive, or c
 
 For "feeds_people": extract the number of people the dish feeds. If the recipe says "serves 4" or "makes 4 portions", use 4. If it says "makes 24 cookies", use null and leave it for the user.
 
+For "suggested_tags": only include tags from these exact categories — nothing else:
+- Primary protein, if present (e.g. "chicken", "beef", "salmon", "shrimp", "tofu", "eggs", "lamb", "pork")
+- Primary carb, if present (e.g. "pasta", "rice", "potatoes", "bread", "noodles")
+- Cook time tag: include "30 min or under" only if total_time_minutes is 30 or less
+- Primary ethnic/regional cuisine (e.g. "italian", "thai", "mexican", "japanese", "indian", "french", "chinese") — only if clearly identifiable
+- Diet tags only if the recipe genuinely qualifies: "vegetarian", "vegan", "gluten-free", "dairy-free"
+If a category doesn't apply, omit it. Do not add tags like "easy", "dinner", "healthy", "homemade", "delicious", or anything else.
+
 Content:
 ${text}`,
       },
@@ -104,7 +112,14 @@ Rules:
 - "instructions" must never be an empty array if the recipe has steps
 - "quantity" must always be a string (e.g. "2", "1/2", "3")
 - "is_primary": true for main/expensive/centerpiece ingredients; false for pantry staples (salt, pepper, oil, basic spices)
-- "feeds_people": number of servings/people, or null if not stated`,
+- "feeds_people": number of servings/people, or null if not stated
+- "suggested_tags": only include tags from these exact categories — nothing else:
+  - Primary protein if present (e.g. "chicken", "beef", "salmon", "shrimp", "tofu", "eggs", "lamb", "pork")
+  - Primary carb if present (e.g. "pasta", "rice", "potatoes", "bread", "noodles")
+  - Cook time: include "30 min or under" only if total_time_minutes is 30 or less
+  - Primary ethnic/regional cuisine (e.g. "italian", "thai", "mexican", "japanese", "indian", "french", "chinese") — only if clearly identifiable
+  - Diet tags only if the recipe genuinely qualifies: "vegetarian", "vegan", "gluten-free", "dairy-free"
+  If a category doesn't apply, omit it. Do not add tags like "easy", "dinner", "healthy", "homemade", or anything else.`,
           },
         ],
       },
@@ -179,7 +194,14 @@ Return ONLY valid JSON with this exact structure:
 }
 
 For "is_primary": mark main, expensive, or centerpiece ingredients as true. Common pantry staples (salt, pepper, oil, basic spices) as false.
-For "feeds_people": number of people the dish feeds, or null if unclear.`,
+For "feeds_people": number of people the dish feeds, or null if unclear.
+For "suggested_tags": only include tags from these exact categories — nothing else:
+- Primary protein if present (e.g. "chicken", "beef", "salmon", "shrimp", "tofu", "eggs", "lamb", "pork")
+- Primary carb if present (e.g. "pasta", "rice", "potatoes", "bread", "noodles")
+- Cook time: include "30 min or under" only if total_time_minutes is 30 or less
+- Primary ethnic/regional cuisine (e.g. "italian", "thai", "mexican", "japanese", "indian", "french", "chinese") — only if clearly identifiable
+- Diet tags only if the recipe genuinely qualifies: "vegetarian", "vegan", "gluten-free", "dairy-free"
+If a category doesn't apply, omit it. Do not add tags like "easy", "dinner", "healthy", "homemade", or anything else.`,
           },
         ],
       },
