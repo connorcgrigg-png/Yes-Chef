@@ -18,29 +18,31 @@ export function scaleIngredient(ingredient: Ingredient, originalFeeds: number, t
 }
 
 function scaleQuantityString(quantity: string, ratio: number): string {
+  const qty = String(quantity ?? '')
+
   // Handle fractions like "1/2", "3/4"
-  const fractionMatch = quantity.match(/^(\d+)\s*\/\s*(\d+)$/)
+  const fractionMatch = qty.match(/^(\d+)\s*\/\s*(\d+)$/)
   if (fractionMatch) {
     const val = (parseInt(fractionMatch[1]) / parseInt(fractionMatch[2])) * ratio
     return formatNumber(val)
   }
 
   // Handle mixed numbers like "1 1/2"
-  const mixedMatch = quantity.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/)
+  const mixedMatch = qty.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/)
   if (mixedMatch) {
     const val = (parseInt(mixedMatch[1]) + parseInt(mixedMatch[2]) / parseInt(mixedMatch[3])) * ratio
     return formatNumber(val)
   }
 
   // Handle plain numbers
-  const numMatch = quantity.match(/^(\d+(?:\.\d+)?)/)
+  const numMatch = qty.match(/^(\d+(?:\.\d+)?)/)
   if (numMatch) {
     const val = parseFloat(numMatch[1]) * ratio
-    const suffix = quantity.slice(numMatch[1].length)
+    const suffix = qty.slice(numMatch[1].length)
     return formatNumber(val) + suffix
   }
 
-  return quantity
+  return qty
 }
 
 function formatNumber(n: number): string {

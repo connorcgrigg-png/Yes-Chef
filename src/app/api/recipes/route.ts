@@ -55,12 +55,18 @@ export async function POST(request: NextRequest) {
   const { collection_ids = [], tag_ids = [], suggested_tags = [], ...recipeData } = body
 
   // Add IDs to ingredients and instructions
-  const ingredients = (recipeData.ingredients ?? []).map((ing: object & { quantity: string; unit?: string }) => ({
-    ...ing,
-    id: generateId(),
-    original_quantity: ing.quantity,
-    original_unit: ing.unit,
-  }))
+  const ingredients = (recipeData.ingredients ?? []).map((ing: object & { quantity: unknown; unit?: unknown }) => {
+    const quantity = String(ing.quantity ?? '')
+    const unit = ing.unit ? String(ing.unit) : undefined
+    return {
+      ...ing,
+      id: generateId(),
+      quantity,
+      unit,
+      original_quantity: quantity,
+      original_unit: unit,
+    }
+  })
 
   const instructions = (recipeData.instructions ?? []).map((inst: object) => ({
     ...inst,
