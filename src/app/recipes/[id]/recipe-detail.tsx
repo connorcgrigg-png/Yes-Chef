@@ -248,11 +248,16 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
           </button>
         ) : (
           <button
-            className="flex items-center gap-1.5 hover:text-stone-700"
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-stone-100 transition-colors group"
             onClick={() => setEditingFeeds(true)}
           >
             <Users className="h-4 w-4" />
-            Base recipe actually feeds {recipe.feeds_people} people
+            Base recipe actually feeds{' '}
+            <span className="underline underline-offset-2 decoration-dashed decoration-stone-400 group-hover:decoration-stone-600">
+              {recipe.feeds_people}
+            </span>{' '}
+            people
+            <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
           </button>
         )}
 
