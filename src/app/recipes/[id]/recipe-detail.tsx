@@ -31,6 +31,8 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
   const [tagInput, setTagInput] = useState('')
   const [availableTags, setAvailableTags] = useState(allTags)
   const tagInputRef = useRef<HTMLInputElement>(null)
+  const [showCollectionPicker, setShowCollectionPicker] = useState(false)
+  const collectionPickerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
   async function patch(updates: Partial<Recipe> & { tag_ids?: string[]; collection_ids?: string[] }) {
@@ -103,6 +105,17 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
     }
   }, [addingTag])
 
+  useEffect(() => {
+    if (!showCollectionPicker) return
+    function handleClick(e: MouseEvent) {
+      if (collectionPickerRef.current && !collectionPickerRef.current.contains(e.target as Node)) {
+        setShowCollectionPicker(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showCollectionPicker])
+
   async function addTag(name: string) {
     const trimmed = name.trim()
     if (!trimmed) { setAddingTag(false); setTagInput(''); return }
@@ -121,6 +134,19 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
 
   async function removeTag(tagId: string) {
     await patch({ tag_ids: recipeTags.filter(rt => rt.tag_id !== tagId).map(rt => rt.tag_id) })
+  }
+
+  const recipeCollectionIds = (recipe.recipe_collections ?? []).map(rc => rc.collection_id)
+  const recipeCollections = allCollections.filter(c => recipeCollectionIds.includes(c.id))
+  const unaddedCollections = allCollections.filter(c => !recipeCollectionIds.includes(c.id))
+
+  async function addToCollection(collectionId: string) {
+    setShowCollectionPicker(false)
+    await patch({ collection_ids: [...recipeCollectionIds, collectionId] })
+  }
+
+  async function removeFromCollection(collectionId: string) {
+    await patch({ collection_ids: recipeCollectionIds.filter(id => id !== collectionId) })
   }
 
   return (
@@ -332,6 +358,56 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
           </div>
         )}
       </div>
+
+      {/* Collections */}
+      {(recipeCollections.length > 0 || allCollections.length > 0) && (
+        <div className="mb-6">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {recipeCollections.map(col => (
+              <span
+                key={col.id}
+                className="group inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                style={col.color ? { backgroundColor: col.color + '20', color: col.color } : { backgroundColor: '#f5f5f4', color: '#78716c' }}
+              >
+                <span>{col.icon}</span>
+                {col.name}
+                <button
+                  onClick={() => removeFromCollection(col.id)}
+                  className="opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity ml-0.5 -mr-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+
+            {unaddedCollections.length > 0 && (
+              <div className="relative" ref={collectionPickerRef}>
+                <button
+                  onClick={() => setShowCollectionPicker(v => !v)}
+                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 px-2.5 py-0.5 text-xs text-stone-400 hover:border-stone-400 hover:text-stone-600 transition-colors"
+                >
+                  <Plus className="h-3 w-3" />
+                  Add to collection
+                </button>
+                {showCollectionPicker && (
+                  <div className="absolute left-0 top-full z-10 mt-1 min-w-[160px] rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                    {unaddedCollections.map(col => (
+                      <button
+                        key={col.id}
+                        onMouseDown={() => addToCollection(col.id)}
+                        className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+                      >
+                        <span>{col.icon}</span>
+                        {col.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Description */}
       {recipe.description && (
