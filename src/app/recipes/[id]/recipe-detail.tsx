@@ -28,13 +28,17 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
   const router = useRouter()
 
   async function patch(updates: Partial<Recipe>) {
-    const res = await fetch(`/api/recipes/${recipe.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates),
-    })
-    const data = await res.json()
-    if (data.recipe) setRecipe(data.recipe)
+    try {
+      const res = await fetch(`/api/recipes/${recipe.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      const data = await res.json()
+      if (data.recipe) setRecipe(data.recipe)
+    } catch (e) {
+      console.error('Failed to update recipe:', e)
+    }
   }
 
   async function saveTitle() {
@@ -105,7 +109,8 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
               autoFocus
               value={titleValue}
               onChange={e => setTitleValue(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && saveTitle()}
+              onKeyDown={e => { if (e.key === 'Enter') { e.currentTarget.blur() } }}
+              onBlur={saveTitle}
               className="flex-1 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-2xl font-bold focus:outline-none"
             />
             <Button size="icon" onClick={saveTitle}><Check className="h-4 w-4" /></Button>
@@ -133,7 +138,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
               type="number"
               value={feedsValue}
               onChange={e => setFeedsValue(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && saveFeeds()}
+              onKeyDown={e => { if (e.key === 'Enter') { e.currentTarget.blur() } }}
               onBlur={saveFeeds}
               className="w-14 rounded border border-amber-300 bg-amber-50 px-2 py-0.5 text-sm focus:outline-none"
             />

@@ -32,7 +32,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     .update(recipeData)
     .eq('id', id)
     .eq('user_id', user.id)
-    .select()
+    .select('*, recipe_collections(collection_id), recipe_tags(tag_id, tags(name, color))')
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
