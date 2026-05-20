@@ -62,12 +62,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 })
     }
 
-    const fileName = `${user.id}/${Date.now()}-${file.name}`
-    await supabase.storage.from('recipe-uploads').upload(fileName, buffer, { contentType: fileType })
-
     const isImage = fileType.startsWith('image/')
+    const fileName = `${user.id}/${Date.now()}-${file.name}`
+
+    if (isImage) {
+      await supabase.storage.from('recipe-covers').upload(fileName, buffer, { contentType: fileType })
+    } else {
+      await supabase.storage.from('recipe-uploads').upload(fileName, buffer, { contentType: fileType })
+    }
+
     const imageUrl = isImage
-      ? supabase.storage.from('recipe-uploads').getPublicUrl(fileName).data.publicUrl
+      ? supabase.storage.from('recipe-covers').getPublicUrl(fileName).data.publicUrl
       : undefined
 
     return NextResponse.json({ recipe: extracted, source_type: isImage ? 'image' : 'pdf', image_url: imageUrl })

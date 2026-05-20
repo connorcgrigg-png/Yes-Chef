@@ -69,8 +69,8 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
       const supabase = createClient()
       const ext = file.name.split('.').pop() ?? 'jpg'
       const path = `${recipe.user_id}/covers/${recipe.id}.${ext}`
-      await supabase.storage.from('recipe-uploads').upload(path, file, { upsert: true, contentType: file.type })
-      const { data } = supabase.storage.from('recipe-uploads').getPublicUrl(path)
+      await supabase.storage.from('recipe-covers').upload(path, file, { upsert: true, contentType: file.type })
+      const { data } = supabase.storage.from('recipe-covers').getPublicUrl(path)
       await patch({ image_url: data.publicUrl })
     } finally {
       setUploadingImage(false)
