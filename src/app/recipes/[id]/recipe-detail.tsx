@@ -124,7 +124,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-4 py-8">
       {/* Back + actions */}
       <div className="mb-6 flex items-center justify-between">
         <button
@@ -339,7 +339,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
       )}
 
       {/* Two-column layout: ingredients + instructions */}
-      <div className="grid gap-10 md:grid-cols-[2fr_3fr]">
+      <div className="grid gap-12 md:grid-cols-[5fr_7fr]">
         <section>
           <h2 className="mb-4 text-lg font-semibold text-stone-900">Ingredients</h2>
           <IngredientList recipe={recipe} onChangeIngredients={updateIngredients} editable />
