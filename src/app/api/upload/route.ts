@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { extractRecipeFromImages, extractRecipeFromText } from '@/lib/claude'
+import { extractRecipeFromImages, extractRecipeFromText, extractRecipeFromPDF } from '@/lib/claude'
 import { createClient } from '@/lib/supabase/server'
 
 export const maxDuration = 60
@@ -41,11 +41,24 @@ export async function POST(request: NextRequest) {
     let extracted: object
 
     if (fileType === 'application/pdf') {
-      const text = await extractTextFromPDF(buffer)
-      if (text.length < 50) {
-        throw new Error('Could not read text from this PDF — it may be a scanned image. Try uploading a photo of the recipe page instead.')
+      const base64 = buffer.toString('base64')
+      try {
+        // Use Claude's native document API — handles both text and image-based PDFs
+        extracted = await extractRecipeFromPDF(base64)
+      } catch (docErr) {
+        // Fall back to pdfjs text extraction if document API fails (e.g. oversized PDF)
+        console.warn('Claude document API failed, falling back to pdfjs:', docErr instanceof Error ? docErr.message : docErr)
+        const text = await extractTextFromPDF(buffer)
+        console.log(`pdfjs extracted ${text.length} chars: ${text.slice(0, 200)}`)
+        if (text.length < 50) {
+          throw new Error('Could not read text from this PDF — it may be a scanned image. Try uploading a photo of the recipe page instead.')
+        }
+        extracted = await extractRecipeFromText(text, 'PDF recipe document')
+        const r = extracted as { ingredients?: unknown[] }
+        if (!Array.isArray(r.ingredients) || r.ingredients.length === 0) {
+          throw new Error('Could not extract ingredients from this PDF. Try uploading a photo of the recipe page instead.')
+        }
       }
-      extracted = await extractRecipeFromText(text, 'PDF recipe document')
     } else if (fileType.startsWith('image/')) {
       const base64 = buffer.toString('base64')
       extracted = await extractRecipeFromImages([base64])

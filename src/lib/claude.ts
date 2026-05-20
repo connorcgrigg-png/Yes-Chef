@@ -7,7 +7,7 @@ export const anthropic = new Anthropic({
 export async function extractRecipeFromText(text: string, sourceHint?: string): Promise<object> {
   const message = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 4096,
+    max_tokens: 8192,
     messages: [
       {
         role: 'user',
