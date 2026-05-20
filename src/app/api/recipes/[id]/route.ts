@@ -27,13 +27,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const body = await request.json()
   const { collection_ids, tag_ids, ...recipeData } = body
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('recipes')
     .update(recipeData)
     .eq('id', id)
     .eq('user_id', user.id)
-    .select('*, recipe_collections(collection_id), recipe_tags(tag_id, tags(name, color))')
-    .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
@@ -55,7 +53,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
   }
 
-  return NextResponse.json({ recipe: data })
+  const { data: updated, error: fetchError } = await supabase
+    .from('recipes')
+    .select('*, recipe_collections(collection_id), recipe_tags(tag_id, tags(name, color))')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (fetchError) return NextResponse.json({ error: fetchError.message }, { status: 500 })
+  return NextResponse.json({ recipe: updated })
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {

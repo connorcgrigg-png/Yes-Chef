@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Clock, Users, ExternalLink, Edit2, Check, Trash2 } from 'lucide-react'
+import { ArrowLeft, Clock, Users, ExternalLink, Edit2, Check, Trash2, Plus, X } from 'lucide-react'
 import { IngredientList } from '@/components/recipe/ingredient-list'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { formatTime } from '@/lib/utils'
 import type { Recipe, Ingredient } from '@/types'
 
@@ -25,9 +24,12 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
   const [editingFeeds, setEditingFeeds] = useState(false)
   const [feedsValue, setFeedsValue] = useState(String(recipe.feeds_people ?? ''))
   const [feedsPrompt, setFeedsPrompt] = useState(!recipe.feeds_people)
+  const [addingTag, setAddingTag] = useState(false)
+  const [tagInput, setTagInput] = useState('')
+  const tagInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  async function patch(updates: Partial<Recipe>) {
+  async function patch(updates: Partial<Recipe> & { tag_ids?: string[]; collection_ids?: string[] }) {
     try {
       const res = await fetch(`/api/recipes/${recipe.id}`, {
         method: 'PATCH',
@@ -67,6 +69,36 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
   }
 
   const recipeTags = recipe.recipe_tags ?? []
+
+  const suggestions = allTags.filter(t =>
+    !recipeTags.some(rt => rt.tag_id === t.id) &&
+    t.name.toLowerCase().includes(tagInput.toLowerCase()) &&
+    tagInput.length > 0
+  ).slice(0, 5)
+
+  useEffect(() => {
+    if (addingTag) tagInputRef.current?.focus()
+  }, [addingTag])
+
+  async function addTag(name: string) {
+    const trimmed = name.trim()
+    if (!trimmed) { setAddingTag(false); setTagInput(''); return }
+    setAddingTag(false)
+    setTagInput('')
+    const res = await fetch('/api/tags', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: trimmed }),
+    })
+    const { tag } = await res.json()
+    if (!tag) return
+    if (recipeTags.some(rt => rt.tag_id === tag.id)) return
+    await patch({ tag_ids: [...recipeTags.map(rt => rt.tag_id), tag.id] })
+  }
+
+  async function removeTag(tagId: string) {
+    await patch({ tag_ids: recipeTags.filter(rt => rt.tag_id !== tagId).map(rt => rt.tag_id) })
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -177,13 +209,63 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
       </div>
 
       {/* Tags */}
-      {recipeTags.length > 0 && (
-        <div className="mb-6 flex flex-wrap gap-1.5">
+      <div className="mb-6">
+        <div className="flex flex-wrap items-center gap-1.5">
           {recipeTags.map(rt => (
-            <Badge key={rt.tag_id} color={rt.tags?.color}>{rt.tags?.name}</Badge>
+            <span
+              key={rt.tag_id}
+              className="group inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+              style={rt.tags?.color ? { backgroundColor: rt.tags.color + '20', color: rt.tags.color } : { backgroundColor: '#f5f5f4', color: '#78716c' }}
+            >
+              {rt.tags?.name}
+              <button
+                onClick={() => removeTag(rt.tag_id)}
+                className="opacity-0 group-hover:opacity-60 hover:!opacity-100 transition-opacity ml-0.5 -mr-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
           ))}
+
+          {addingTag ? (
+            <div className="relative">
+              <input
+                ref={tagInputRef}
+                value={tagInput}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') addTag(tagInput)
+                  if (e.key === 'Escape') { setAddingTag(false); setTagInput('') }
+                }}
+                onBlur={() => setTimeout(() => { setAddingTag(false); setTagInput('') }, 150)}
+                placeholder="Tag name…"
+                className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs focus:outline-none w-28"
+              />
+              {suggestions.length > 0 && (
+                <div className="absolute top-full left-0 mt-1 z-10 flex flex-col gap-0.5 rounded-lg border border-stone-200 bg-white p-1 shadow-md min-w-max">
+                  {suggestions.map(t => (
+                    <button
+                      key={t.id}
+                      onMouseDown={() => addTag(t.name)}
+                      className="rounded px-2.5 py-1 text-left text-xs text-stone-700 hover:bg-stone-100"
+                    >
+                      {t.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setAddingTag(true)}
+              className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 px-2.5 py-0.5 text-xs text-stone-400 hover:border-stone-400 hover:text-stone-600 transition-colors"
+            >
+              <Plus className="h-3 w-3" />
+              Add tag
+            </button>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Description */}
       {recipe.description && (
