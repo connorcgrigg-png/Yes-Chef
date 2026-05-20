@@ -54,7 +54,7 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
   const [search, setSearch] = useState('')
   const [tagSearch, setTagSearch] = useState('')
   const [activeCollection, setActiveCollection] = useState<string | null>(null)
-  const [activeTag, setActiveTag] = useState<string | null>(null)
+  const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
   const [showImport, setShowImport] = useState(false)
   const router = useRouter()
 
@@ -73,11 +73,11 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
     if (activeCollection) {
       result = result.filter(r => r.recipe_collections?.some(rc => rc.collection_id === activeCollection))
     }
-    if (activeTag) {
-      result = result.filter(r => r.recipe_tags?.some(rt => rt.tag_id === activeTag))
+    if (activeTags.size > 0) {
+      result = result.filter(r => [...activeTags].every(tid => r.recipe_tags?.some(rt => rt.tag_id === tid)))
     }
     return result
-  }, [recipes, search, activeCollection, activeTag])
+  }, [recipes, search, activeCollection, activeTags])
 
   const tagSearchResults = useMemo(() => {
     if (!tagSearch.trim()) return []
@@ -103,7 +103,11 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
   }
 
   function toggleTag(id: string) {
-    setActiveTag(prev => prev === id ? null : id)
+    setActiveTags(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
     setTagSearch('')
   }
 
@@ -145,7 +149,14 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
             {/* Tag filters */}
             {usedTags.length > 0 && (
               <div>
-                <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-stone-400">Filter by Tag</h3>
+                <div className="mb-2 flex items-center justify-between px-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400">Filter by Tag</h3>
+                  {activeTags.size > 0 && (
+                    <button onClick={() => setActiveTags(new Set())} className="text-xs text-amber-600 hover:text-amber-700">
+                      Clear ({activeTags.size})
+                    </button>
+                  )}
+                </div>
 
                 {/* Tag search */}
                 <div className="relative mb-3 px-2">
@@ -162,7 +173,7 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
                   /* Flat search results */
                   <div className="flex flex-wrap gap-1.5 px-2">
                     {tagSearchResults.length > 0 ? tagSearchResults.map(tag => (
-                      <TagChip key={tag.id} tag={tag} active={activeTag === tag.id} dim={!!activeTag} onClick={() => toggleTag(tag.id)} />
+                      <TagChip key={tag.id} tag={tag} active={activeTags.has(tag.id)} dim={activeTags.size > 0} onClick={() => toggleTag(tag.id)} />
                     )) : (
                       <p className="text-xs text-stone-400">No tags match</p>
                     )}
@@ -178,7 +189,7 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
                           <p className="mb-1.5 text-xs font-medium text-stone-400">{bucket.label}</p>
                           <div className="flex flex-wrap gap-1.5">
                             {bucketTags.map(tag => (
-                              <TagChip key={tag.id} tag={tag} active={activeTag === tag.id} dim={!!activeTag} onClick={() => toggleTag(tag.id)} />
+                              <TagChip key={tag.id} tag={tag} active={activeTags.has(tag.id)} dim={activeTags.size > 0} onClick={() => toggleTag(tag.id)} />
                             ))}
                           </div>
                         </div>
@@ -190,7 +201,7 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
                         <p className="mb-1.5 text-xs font-medium text-stone-400">Other</p>
                         <div className="flex flex-wrap gap-1.5">
                           {otherTags.map(tag => (
-                            <TagChip key={tag.id} tag={tag} active={activeTag === tag.id} dim={!!activeTag} onClick={() => toggleTag(tag.id)} />
+                            <TagChip key={tag.id} tag={tag} active={activeTags.has(tag.id)} dim={activeTags.size > 0} onClick={() => toggleTag(tag.id)} />
                           ))}
                         </div>
                       </div>
