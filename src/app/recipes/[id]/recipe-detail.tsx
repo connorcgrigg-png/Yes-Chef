@@ -26,6 +26,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
   const [feedsPrompt, setFeedsPrompt] = useState(!recipe.feeds_people)
   const [addingTag, setAddingTag] = useState(false)
   const [tagInput, setTagInput] = useState('')
+  const [availableTags, setAvailableTags] = useState(allTags)
   const tagInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
@@ -70,14 +71,17 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
 
   const recipeTags = recipe.recipe_tags ?? []
 
-  const suggestions = allTags.filter(t =>
+  const suggestions = availableTags.filter(t =>
     !recipeTags.some(rt => rt.tag_id === t.id) &&
     t.name.toLowerCase().includes(tagInput.toLowerCase()) &&
     tagInput.length > 0
-  ).slice(0, 5)
+  ).slice(0, 6)
 
   useEffect(() => {
-    if (addingTag) tagInputRef.current?.focus()
+    if (addingTag) {
+      tagInputRef.current?.focus()
+      fetch('/api/tags').then(r => r.json()).then(d => { if (d.tags) setAvailableTags(d.tags) })
+    }
   }, [addingTag])
 
   async function addTag(name: string) {
@@ -228,33 +232,18 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
           ))}
 
           {addingTag ? (
-            <div className="relative">
-              <input
-                ref={tagInputRef}
-                value={tagInput}
-                onChange={e => setTagInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') addTag(tagInput)
-                  if (e.key === 'Escape') { setAddingTag(false); setTagInput('') }
-                }}
-                onBlur={() => setTimeout(() => { setAddingTag(false); setTagInput('') }, 150)}
-                placeholder="Tag name…"
-                className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs focus:outline-none w-28"
-              />
-              {suggestions.length > 0 && (
-                <div className="absolute top-full left-0 mt-1 z-10 flex flex-col gap-0.5 rounded-lg border border-stone-200 bg-white p-1 shadow-md min-w-max">
-                  {suggestions.map(t => (
-                    <button
-                      key={t.id}
-                      onMouseDown={() => addTag(t.name)}
-                      className="rounded px-2.5 py-1 text-left text-xs text-stone-700 hover:bg-stone-100"
-                    >
-                      {t.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <input
+              ref={tagInputRef}
+              value={tagInput}
+              onChange={e => setTagInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') addTag(tagInput)
+                if (e.key === 'Escape') { setAddingTag(false); setTagInput('') }
+              }}
+              onBlur={() => setTimeout(() => { setAddingTag(false); setTagInput('') }, 150)}
+              placeholder="Tag name…"
+              className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs focus:outline-none w-28"
+            />
           ) : (
             <button
               onClick={() => setAddingTag(true)}
@@ -265,6 +254,20 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
             </button>
           )}
         </div>
+
+        {addingTag && suggestions.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {suggestions.map(t => (
+              <button
+                key={t.id}
+                onMouseDown={() => addTag(t.name)}
+                className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Description */}
