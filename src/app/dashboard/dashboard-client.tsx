@@ -28,6 +28,12 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
   const [showImport, setShowImport] = useState(false)
   const router = useRouter()
 
+  const usedTagIds = useMemo(() => {
+    const ids = new Set<string>()
+    recipes.forEach(r => r.recipe_tags?.forEach(rt => ids.add(rt.tag_id)))
+    return ids
+  }, [recipes])
+
   const filtered = useMemo(() => {
     let result = recipes
 
@@ -101,11 +107,11 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
               </nav>
             </div>
 
-            {tags.length > 0 && (
+            {usedTagIds.size > 0 && (
               <div>
                 <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-stone-400">Tags</h3>
                 <div className="flex flex-wrap gap-1.5 px-2">
-                  {tags.map(tag => (
+                  {tags.filter(t => usedTagIds.has(t.id)).map(tag => (
                     <button key={tag.id} onClick={() => setActiveTag(activeTag === tag.id ? null : tag.id)}>
                       <Badge
                         color={activeTag === tag.id ? tag.color : undefined}
