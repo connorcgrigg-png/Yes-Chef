@@ -42,21 +42,15 @@ export async function POST(request: NextRequest) {
 
     if (fileType === 'application/pdf') {
       const base64 = buffer.toString('base64')
-      console.log(`[upload] PDF received, buffer=${buffer.length} bytes, base64=${base64.length} chars`)
       try {
         extracted = await extractRecipeFromPDF(base64)
-        const r = extracted as { title?: string; ingredients?: unknown[]; instructions?: unknown[] }
-        console.log(`[upload] document API success: title="${r.title}", ingredients=${r.ingredients?.length ?? 0}, instructions=${r.instructions?.length ?? 0}`)
       } catch (docErr) {
-        console.warn('[upload] Claude document API failed, falling back to pdfjs:', docErr instanceof Error ? docErr.message : docErr)
         const text = await extractTextFromPDF(buffer)
-        console.log(`[upload] pdfjs extracted ${text.length} chars — preview: ${JSON.stringify(text.slice(0, 300))}`)
         if (text.length < 50) {
           throw new Error('Could not read text from this PDF — it may be a scanned image. Try uploading a photo of the recipe page instead.')
         }
         extracted = await extractRecipeFromText(text, 'PDF recipe document')
-        const r = extracted as { title?: string; ingredients?: unknown[]; instructions?: unknown[] }
-        console.log(`[upload] text extraction result: title="${r.title}", ingredients=${r.ingredients?.length ?? 0}, instructions=${r.instructions?.length ?? 0}`)
+        const r = extracted as { ingredients?: unknown[] }
         if (!Array.isArray(r.ingredients) || r.ingredients.length === 0) {
           throw new Error('Could not extract ingredients from this PDF. Try uploading a photo of the recipe page instead.')
         }
@@ -68,7 +62,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 })
     }
 
-    // Upload original file to Supabase Storage
     const fileName = `${user.id}/${Date.now()}-${file.name}`
     await supabase.storage.from('recipe-uploads').upload(fileName, buffer, {
       contentType: fileType,
