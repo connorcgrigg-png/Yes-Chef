@@ -11,7 +11,6 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   const pdf = await getDocument({
     data: new Uint8Array(buffer),
     useWorkerFetch: false,
-    isEvalSupported: false,
     useSystemFonts: true,
   }).promise
 
@@ -19,7 +18,7 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
     Array.from({ length: pdf.numPages }, async (_, i) => {
       const page = await pdf.getPage(i + 1)
       const content = await page.getTextContent()
-      return content.items.map((item: { str: string }) => item.str).join(' ')
+      return content.items.map((item) => ('str' in item ? item.str : '')).join(' ')
     })
   )
 
