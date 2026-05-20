@@ -163,7 +163,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
             className="group relative cursor-pointer overflow-hidden rounded-2xl"
             onClick={() => imageInputRef.current?.click()}
           >
-            <img src={recipe.image_url} alt={recipe.title} className="h-72 w-full object-cover" />
+            <img src={recipe.image_url} alt={recipe.title} className="h-[28rem] w-full object-cover" />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/0 text-white opacity-0 transition-all group-hover:bg-black/30 group-hover:opacity-100">
               {uploadingImage ? (
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -178,7 +178,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
         ) : (
           <button
             onClick={() => imageInputRef.current?.click()}
-            className="flex h-52 w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-stone-200 bg-gradient-to-br from-amber-50 via-stone-100 to-stone-200 text-stone-400 transition-colors hover:border-stone-300 hover:text-stone-500"
+            className="flex h-[28rem] w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-stone-200 bg-gradient-to-br from-amber-50 via-stone-100 to-stone-200 text-stone-400 transition-colors hover:border-stone-300 hover:text-stone-500"
           >
             {uploadingImage ? (
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
