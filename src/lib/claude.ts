@@ -48,7 +48,11 @@ For "suggested_tags": only include tags from these exact categories — nothing 
 - Primary carb, if present (e.g. "pasta", "rice", "potatoes", "bread", "noodles")
 - Cook time tag: include "30 min or under" only if total_time_minutes is 30 or less
 - Primary ethnic/regional cuisine (e.g. "italian", "thai", "mexican", "japanese", "indian", "french", "chinese") — only if clearly identifiable
-- Diet tags only if the recipe genuinely qualifies: "vegetarian", "vegan", "gluten-free", "dairy-free"
+- Diet tags — apply each only if the recipe genuinely qualifies:
+  - "vegetarian": no meat, poultry, or seafood
+  - "vegan": no animal products at all (no meat, fish, dairy, eggs, honey)
+  - "gluten-free": carefully check every ingredient — if NONE of them contain gluten sources (wheat, flour, bread, pasta, barley, rye, oats, soy sauce, teriyaki sauce, malt, semolina, spelt, farro, couscous, bulgur, breadcrumbs, panko, beer, or any wheat-derived ingredient), then add "gluten-free"
+  - "dairy-free": no milk, cream, butter, cheese, yogurt, or other dairy
 If a category doesn't apply, omit it. Do not add tags like "easy", "dinner", "healthy", "homemade", "delicious", or anything else.
 
 Content:
@@ -118,7 +122,11 @@ Rules:
   - Primary carb if present (e.g. "pasta", "rice", "potatoes", "bread", "noodles")
   - Cook time: include "30 min or under" only if total_time_minutes is 30 or less
   - Primary ethnic/regional cuisine (e.g. "italian", "thai", "mexican", "japanese", "indian", "french", "chinese") — only if clearly identifiable
-  - Diet tags only if the recipe genuinely qualifies: "vegetarian", "vegan", "gluten-free", "dairy-free"
+  - Diet tags — apply each only if the recipe genuinely qualifies:
+    - "vegetarian": no meat, poultry, or seafood
+    - "vegan": no animal products at all
+    - "gluten-free": check every ingredient — if NONE contain gluten sources (wheat, flour, bread, pasta, barley, rye, oats, soy sauce, teriyaki sauce, malt, semolina, spelt, farro, couscous, bulgur, breadcrumbs, panko, beer, or any wheat-derived ingredient), add "gluten-free"
+    - "dairy-free": no milk, cream, butter, cheese, yogurt, or other dairy
   If a category doesn't apply, omit it. Do not add tags like "easy", "dinner", "healthy", "homemade", or anything else.`,
           },
         ],
@@ -200,7 +208,11 @@ For "suggested_tags": only include tags from these exact categories — nothing 
 - Primary carb if present (e.g. "pasta", "rice", "potatoes", "bread", "noodles")
 - Cook time: include "30 min or under" only if total_time_minutes is 30 or less
 - Primary ethnic/regional cuisine (e.g. "italian", "thai", "mexican", "japanese", "indian", "french", "chinese") — only if clearly identifiable
-- Diet tags only if the recipe genuinely qualifies: "vegetarian", "vegan", "gluten-free", "dairy-free"
+- Diet tags — apply each only if the recipe genuinely qualifies:
+  - "vegetarian": no meat, poultry, or seafood
+  - "vegan": no animal products at all
+  - "gluten-free": check every ingredient — if NONE contain gluten sources (wheat, flour, bread, pasta, barley, rye, oats, soy sauce, teriyaki sauce, malt, semolina, spelt, farro, couscous, bulgur, breadcrumbs, panko, beer, or any wheat-derived ingredient), add "gluten-free"
+  - "dairy-free": no milk, cream, butter, cheese, yogurt, or other dairy
 If a category doesn't apply, omit it. Do not add tags like "easy", "dinner", "healthy", "homemade", or anything else.`,
           },
         ],

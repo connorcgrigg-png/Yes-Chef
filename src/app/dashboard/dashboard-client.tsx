@@ -23,7 +23,7 @@ const TAG_BUCKETS = [
   { key: 'protein',  label: 'Protein',       keywords: ['chicken', 'beef', 'salmon', 'shrimp', 'tofu', 'eggs', 'lamb', 'pork', 'turkey', 'tuna', 'cod', 'duck', 'bacon', 'sausage', 'crab', 'lobster', 'scallops', 'fish', 'steak', 'mince', 'ground beef'] },
   { key: 'cuisine',  label: 'Cuisine',        keywords: ['italian', 'thai', 'mexican', 'japanese', 'indian', 'french', 'chinese', 'greek', 'spanish', 'korean', 'vietnamese', 'moroccan', 'mediterranean', 'american', 'cajun', 'persian', 'caribbean', 'british', 'german', 'middle eastern'] },
   { key: 'carb',     label: 'Base Carb',      keywords: ['pasta', 'rice', 'potatoes', 'bread', 'noodles', 'quinoa', 'couscous', 'barley', 'oats', 'polenta', 'gnocchi', 'tortilla', 'lentils', 'beans'] },
-  { key: 'diet',     label: 'Diet',           keywords: ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'keto', 'paleo', 'whole30', 'low-carb', 'nut-free'] },
+  { key: 'diet',     label: 'Diet',           keywords: ['vegetarian', 'vegan', 'gluten-free', 'gluten free', 'dairy-free', 'dairy free', 'keto', 'paleo', 'whole30', 'low-carb', 'nut-free'] },
   { key: 'time',     label: 'Cook Time',      keywords: ['30 min or under'] },
 ]
 
