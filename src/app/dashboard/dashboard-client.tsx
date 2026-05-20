@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, ChefHat } from 'lucide-react'
+import { Search, Plus, ChefHat, Pencil, Trash2 } from 'lucide-react'
 import { RecipeCard } from '@/components/recipe/recipe-card'
 import { ImportModal } from '@/components/recipe/import-modal'
 import { Input } from '@/components/ui/input'
@@ -49,13 +49,22 @@ function TagChip({ tag, active, dim, onClick }: { tag: Tag; active: boolean; dim
   )
 }
 
-export function DashboardClient({ initialRecipes, collections, tags }: Props) {
+export function DashboardClient({ initialRecipes, collections: initialCollections, tags }: Props) {
   const [recipes, setRecipes] = useState(initialRecipes)
+  const [collections, setCollections] = useState(initialCollections)
   const [search, setSearch] = useState('')
   const [tagSearch, setTagSearch] = useState('')
   const [activeCollection, setActiveCollection] = useState<string | null>(null)
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
   const [showImport, setShowImport] = useState(false)
+
+  // Collection management
+  const [addingCollection, setAddingCollection] = useState(false)
+  const [newCollectionName, setNewCollectionName] = useState('')
+  const [renamingId, setRenamingId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+  const newColInputRef = useRef<HTMLInputElement>(null)
+
   const router = useRouter()
 
   const usedTags = useMemo(() => {
@@ -85,7 +94,6 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
     return usedTags.filter(t => t.name.includes(q))
   }, [tagSearch, usedTags])
 
-  // Tags not matched by any bucket
   const otherTags = useMemo(() =>
     usedTags.filter(t => !TAG_BUCKETS.some(b => matchesBucket(t.name, b.keywords))),
     [usedTags]
@@ -111,6 +119,48 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
     setTagSearch('')
   }
 
+  async function createCollection() {
+    const name = newCollectionName.trim()
+    setAddingCollection(false)
+    setNewCollectionName('')
+    if (!name) return
+    const res = await fetch('/api/collections', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    })
+    const data = await res.json()
+    if (data.collection) {
+      setCollections(prev => [...prev, data.collection].sort((a, b) => a.name.localeCompare(b.name)))
+    }
+  }
+
+  async function saveRename(id: string) {
+    const name = renameValue.trim()
+    setRenamingId(null)
+    setRenameValue('')
+    if (!name) return
+    const res = await fetch(`/api/collections/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    })
+    const data = await res.json()
+    if (data.collection) {
+      setCollections(prev =>
+        prev.map(c => c.id === id ? { ...c, name: data.collection.name } : c)
+          .sort((a, b) => a.name.localeCompare(b.name))
+      )
+    }
+  }
+
+  async function deleteCollection(id: string) {
+    if (!confirm('Delete this collection? Recipes in it will not be deleted.')) return
+    await fetch(`/api/collections/${id}`, { method: 'DELETE' })
+    setCollections(prev => prev.filter(c => c.id !== id))
+    if (activeCollection === id) setActiveCollection(null)
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="flex gap-8">
@@ -119,8 +169,18 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
           <div className="space-y-6">
             {/* Collections */}
             <div>
-              <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-stone-400">Collections</h3>
+              <div className="mb-2 flex items-center justify-between px-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400">Collections</h3>
+                <button
+                  onClick={() => { setAddingCollection(true); setTimeout(() => newColInputRef.current?.focus(), 0) }}
+                  className="flex h-5 w-5 items-center justify-center rounded text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+                  title="New collection"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
               <nav className="space-y-0.5">
+                {/* All Recipes — never deletable */}
                 <button
                   onClick={() => setActiveCollection(null)}
                   className={cn('flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors',
@@ -131,18 +191,68 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
                   All Recipes
                   <span className="ml-auto text-xs text-stone-400">{recipes.length}</span>
                 </button>
+
                 {collections.map(col => (
-                  <button
-                    key={col.id}
-                    onClick={() => setActiveCollection(activeCollection === col.id ? null : col.id)}
-                    className={cn('flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors',
-                      activeCollection === col.id ? 'bg-stone-100 font-medium text-stone-900' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-50'
-                    )}
-                  >
-                    <span>{col.icon}</span>
-                    {col.name}
-                  </button>
+                  renamingId === col.id ? (
+                    <div key={col.id} className="flex items-center gap-1.5 rounded-lg px-2 py-1.5">
+                      <span className="shrink-0 text-base">{col.icon}</span>
+                      <input
+                        autoFocus
+                        value={renameValue}
+                        onChange={e => setRenameValue(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') saveRename(col.id)
+                          if (e.key === 'Escape') { setRenamingId(null); setRenameValue('') }
+                        }}
+                        onBlur={() => saveRename(col.id)}
+                        className="flex-1 min-w-0 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-sm focus:outline-none"
+                      />
+                    </div>
+                  ) : (
+                    <div key={col.id} className="group/col flex items-center gap-0.5">
+                      <button
+                        onClick={() => setActiveCollection(activeCollection === col.id ? null : col.id)}
+                        className={cn('flex flex-1 min-w-0 items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors',
+                          activeCollection === col.id ? 'bg-stone-100 font-medium text-stone-900' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-50'
+                        )}
+                      >
+                        <span className="shrink-0">{col.icon}</span>
+                        <span className="truncate">{col.name}</span>
+                      </button>
+                      <button
+                        onClick={() => { setRenamingId(col.id); setRenameValue(col.name) }}
+                        className="shrink-0 flex h-6 w-6 items-center justify-center rounded text-stone-300 opacity-0 group-hover/col:opacity-100 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+                      >
+                        <Pencil className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => deleteCollection(col.id)}
+                        className="shrink-0 flex h-6 w-6 items-center justify-center rounded text-stone-300 opacity-0 group-hover/col:opacity-100 hover:text-red-500 hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )
                 ))}
+
+                {/* Inline new collection input */}
+                {addingCollection && (
+                  <div className="flex items-center gap-1.5 rounded-lg px-2 py-1.5">
+                    <span className="shrink-0 text-base">📁</span>
+                    <input
+                      ref={newColInputRef}
+                      value={newCollectionName}
+                      onChange={e => setNewCollectionName(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') createCollection()
+                        if (e.key === 'Escape') { setAddingCollection(false); setNewCollectionName('') }
+                      }}
+                      onBlur={() => { if (newCollectionName.trim()) createCollection(); else { setAddingCollection(false); setNewCollectionName('') } }}
+                      placeholder="Collection name…"
+                      className="flex-1 min-w-0 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-sm focus:outline-none"
+                    />
+                  </div>
+                )}
               </nav>
             </div>
 
@@ -170,7 +280,6 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
                 </div>
 
                 {tagSearch ? (
-                  /* Flat search results */
                   <div className="flex flex-wrap gap-1.5 px-2">
                     {tagSearchResults.length > 0 ? tagSearchResults.map(tag => (
                       <TagChip key={tag.id} tag={tag} active={activeTags.has(tag.id)} dim={activeTags.size > 0} onClick={() => toggleTag(tag.id)} />
@@ -179,7 +288,6 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
                     )}
                   </div>
                 ) : (
-                  /* Bucketed view */
                   <div className="space-y-3">
                     {TAG_BUCKETS.map(bucket => {
                       const bucketTags = usedTags.filter(t => matchesBucket(t.name, bucket.keywords))
@@ -258,4 +366,3 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
     </div>
   )
 }
-
