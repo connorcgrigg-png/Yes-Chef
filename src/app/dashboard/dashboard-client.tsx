@@ -60,12 +60,12 @@ export function DashboardClient({ initialRecipes, collections, tags }: Props) {
     return result
   }, [recipes, search, activeCollection, activeTag])
 
-  async function handleImported(recipe: object, sourceType: string, sourceUrl?: string) {
+  async function handleImported(recipe: object, sourceType: string, sourceUrl?: string, imageUrl?: string) {
     setShowImport(false)
     const res = await fetch('/api/recipes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...recipe, source_type: sourceType, source_url: sourceUrl }),
+      body: JSON.stringify({ ...recipe, source_type: sourceType, source_url: sourceUrl, image_url: imageUrl }),
     })
     const data = await res.json()
     if (data.recipe) {

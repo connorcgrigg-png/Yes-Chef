@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 type Tab = 'url' | 'file' | 'image'
 
 interface ImportModalProps {
-  onImported: (recipe: object, sourceType: string, sourceUrl?: string) => void
+  onImported: (recipe: object, sourceType: string, sourceUrl?: string, imageUrl?: string) => void
   onClose: () => void
 }
 
@@ -33,7 +33,7 @@ export function ImportModal({ onImported, onClose }: ImportModalProps) {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      onImported(data.recipe, 'url', url)
+      onImported(data.recipe, 'url', url, data.image_url)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to import')
     } finally {
@@ -50,7 +50,7 @@ export function ImportModal({ onImported, onClose }: ImportModalProps) {
       const res = await fetch('/api/upload', { method: 'POST', body: formData })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
-      onImported(data.recipe, data.source_type)
+      onImported(data.recipe, data.source_type, undefined, data.image_url)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to process file')
     } finally {

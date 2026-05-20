@@ -63,11 +63,14 @@ export async function POST(request: NextRequest) {
     }
 
     const fileName = `${user.id}/${Date.now()}-${file.name}`
-    await supabase.storage.from('recipe-uploads').upload(fileName, buffer, {
-      contentType: fileType,
-    })
+    await supabase.storage.from('recipe-uploads').upload(fileName, buffer, { contentType: fileType })
 
-    return NextResponse.json({ recipe: extracted, source_type: fileType.startsWith('image/') ? 'image' : 'pdf' })
+    const isImage = fileType.startsWith('image/')
+    const imageUrl = isImage
+      ? supabase.storage.from('recipe-uploads').getPublicUrl(fileName).data.publicUrl
+      : undefined
+
+    return NextResponse.json({ recipe: extracted, source_type: isImage ? 'image' : 'pdf', image_url: imageUrl })
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json(

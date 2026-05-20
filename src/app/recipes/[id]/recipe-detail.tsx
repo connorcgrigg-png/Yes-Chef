@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Clock, Users, ExternalLink, Edit2, Check, Trash2, Plus, X } from 'lucide-react'
+import { ArrowLeft, Clock, Users, ExternalLink, Edit2, Check, Trash2, Plus, X, Camera, ChefHat } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import { IngredientList } from '@/components/recipe/ingredient-list'
 import { Button } from '@/components/ui/button'
 import { formatTime } from '@/lib/utils'
@@ -24,6 +25,8 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
   const [editingFeeds, setEditingFeeds] = useState(false)
   const [feedsValue, setFeedsValue] = useState(String(recipe.feeds_people ?? ''))
   const [feedsPrompt, setFeedsPrompt] = useState(!recipe.feeds_people)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [addingTag, setAddingTag] = useState(false)
   const [tagInput, setTagInput] = useState('')
   const [availableTags, setAvailableTags] = useState(allTags)
@@ -58,6 +61,20 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
 
   async function updateIngredients(ingredients: Ingredient[]) {
     await patch({ ingredients })
+  }
+
+  async function uploadCoverPhoto(file: File) {
+    setUploadingImage(true)
+    try {
+      const supabase = createClient()
+      const ext = file.name.split('.').pop() ?? 'jpg'
+      const path = `${recipe.user_id}/covers/${recipe.id}.${ext}`
+      await supabase.storage.from('recipe-uploads').upload(path, file, { upsert: true, contentType: file.type })
+      const { data } = supabase.storage.from('recipe-uploads').getPublicUrl(path)
+      await patch({ image_url: data.publicUrl })
+    } finally {
+      setUploadingImage(false)
+    }
   }
 
   async function deleteRecipe() {
@@ -133,11 +150,50 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
       </div>
 
       {/* Hero image */}
-      {recipe.image_url && (
-        <div className="mb-8 overflow-hidden rounded-2xl">
-          <img src={recipe.image_url} alt={recipe.title} className="h-72 w-full object-cover" />
-        </div>
-      )}
+      <div className="mb-8">
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={e => { const f = e.target.files?.[0]; if (f) uploadCoverPhoto(f) }}
+        />
+        {recipe.image_url ? (
+          <div
+            className="group relative cursor-pointer overflow-hidden rounded-2xl"
+            onClick={() => imageInputRef.current?.click()}
+          >
+            <img src={recipe.image_url} alt={recipe.title} className="h-72 w-full object-cover" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/0 text-white opacity-0 transition-all group-hover:bg-black/30 group-hover:opacity-100">
+              {uploadingImage ? (
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <>
+                  <Camera className="h-7 w-7" />
+                  <span className="text-sm font-medium">Change photo</span>
+                </>
+              )}
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => imageInputRef.current?.click()}
+            className="flex h-52 w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-stone-200 bg-gradient-to-br from-amber-50 via-stone-100 to-stone-200 text-stone-400 transition-colors hover:border-stone-300 hover:text-stone-500"
+          >
+            {uploadingImage ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
+            ) : (
+              <>
+                <ChefHat className="h-10 w-10 text-stone-300" />
+                <div className="flex items-center gap-1.5 text-sm font-medium">
+                  <Camera className="h-4 w-4" />
+                  Add a photo
+                </div>
+              </>
+            )}
+          </button>
+        )}
+      </div>
 
       {/* Title */}
       <div className="mb-2">

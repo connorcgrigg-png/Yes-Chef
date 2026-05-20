@@ -26,15 +26,25 @@ export async function POST(request: NextRequest) {
 
     // Try JSON-LD structured data first (most recipe sites use this)
     let recipeText = ''
+    let imageUrl = ''
+
     $('script[type="application/ld+json"]').each((_, el) => {
       try {
         const json = JSON.parse($(el).html() ?? '')
         const schema = Array.isArray(json) ? json.find(j => j['@type'] === 'Recipe') : json
         if (schema?.['@type'] === 'Recipe') {
           recipeText = JSON.stringify(schema)
+          const img = schema.image
+          if (typeof img === 'string') imageUrl = img
+          else if (Array.isArray(img)) imageUrl = typeof img[0] === 'string' ? img[0] : img[0]?.url ?? ''
+          else if (img?.url) imageUrl = img.url
         }
       } catch {}
     })
+
+    if (!imageUrl) {
+      imageUrl = $('meta[property="og:image"]').attr('content') ?? $('meta[name="twitter:image"]').attr('content') ?? ''
+    }
 
     // Fallback: extract readable text from the page
     if (!recipeText) {
@@ -45,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     const extracted = await extractRecipeFromText(recipeText, 'recipe webpage content')
 
-    return NextResponse.json({ recipe: extracted, source_url: url })
+    return NextResponse.json({ recipe: extracted, source_url: url, image_url: imageUrl || undefined })
   } catch (error) {
     console.error('Scrape error:', error)
     return NextResponse.json(
