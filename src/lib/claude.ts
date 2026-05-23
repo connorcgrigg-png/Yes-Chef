@@ -65,7 +65,10 @@ ${text}`,
   if (content.type !== 'text') throw new Error('Unexpected response type from Claude')
 
   const jsonMatch = content.text.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error('No JSON found in Claude response')
+  if (!jsonMatch) {
+    console.error('Claude returned no JSON for text extraction. Response:', content.text.slice(0, 500))
+    throw new Error("Couldn't find a recipe in that content. The page may be login-protected, bot-blocked, or simply not a recipe.")
+  }
 
   return JSON.parse(jsonMatch[0])
 }
@@ -142,7 +145,10 @@ Rules:
   }
 
   const jsonMatch = content.text.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error('No JSON found in Claude response')
+  if (!jsonMatch) {
+    console.error('Claude returned no JSON for PDF extraction. Response:', content.text.slice(0, 500))
+    throw new Error("Couldn't extract a recipe from this PDF. Try uploading a photo of the recipe page instead.")
+  }
 
   const parsed = JSON.parse(jsonMatch[0])
 
@@ -224,7 +230,10 @@ If a category doesn't apply, omit it. Do not add tags like "easy", "dinner", "he
   if (content.type !== 'text') throw new Error('Unexpected response type from Claude')
 
   const jsonMatch = content.text.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) throw new Error('No JSON found in Claude response')
+  if (!jsonMatch) {
+    console.error('Claude returned no JSON for image extraction. Response:', content.text.slice(0, 500))
+    throw new Error("Couldn't find a recipe in this image. Make sure the photo clearly shows the ingredients and instructions.")
+  }
 
   return JSON.parse(jsonMatch[0])
 }
