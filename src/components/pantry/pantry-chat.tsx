@@ -83,8 +83,8 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
               className={cn(
                 'max-w-[80%] rounded-2xl px-4 py-3 text-sm',
                 msg.role === 'user'
-                  ? 'bg-stone-900 text-white rounded-br-sm'
-                  : 'bg-stone-100 text-stone-800 rounded-bl-sm'
+                  ? 'bg-stone-900 text-white rounded-br-sm dark:bg-stone-100 dark:text-stone-900'
+                  : 'bg-stone-100 text-stone-800 rounded-bl-sm dark:bg-stone-800 dark:text-stone-200'
               )}
             >
               {msg.content}
@@ -93,23 +93,23 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="rounded-2xl rounded-bl-sm bg-stone-100 px-4 py-3">
-              <Loader2 className="h-4 w-4 animate-spin text-stone-400" />
+            <div className="rounded-2xl rounded-bl-sm bg-stone-100 px-4 py-3 dark:bg-stone-800">
+              <Loader2 className="h-4 w-4 animate-spin text-stone-400 dark:text-stone-500" />
             </div>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-stone-100 p-3">
+      <div className="border-t border-stone-100 p-3 dark:border-stone-800">
         <div className="flex items-center gap-2">
           <button
             onClick={startVoice}
             className={cn(
               'flex h-9 w-9 items-center justify-center rounded-full border transition-colors',
               listening
-                ? 'border-red-300 bg-red-50 text-red-500 animate-pulse'
-                : 'border-stone-200 text-stone-400 hover:text-stone-600 hover:border-stone-300'
+                ? 'border-red-300 bg-red-50 text-red-500 animate-pulse dark:bg-red-950 dark:border-red-700'
+                : 'border-stone-200 text-stone-400 hover:text-stone-600 hover:border-stone-300 dark:border-stone-700 dark:text-stone-500 dark:hover:text-stone-300 dark:hover:border-stone-600'
             )}
           >
             <Mic className="h-4 w-4" />
@@ -119,7 +119,7 @@ export function PantryChat({ onPantryUpdated }: PantryChatProps) {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send(input)}
             placeholder="I have eggs, butter, lemons..."
-            className="flex-1 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300"
+            className="flex-1 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-300 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-500 dark:focus:ring-stone-600"
           />
           <Button size="icon" onClick={() => send(input)} disabled={!input.trim() || loading}>
             <Send className="h-4 w-4" />

@@ -40,37 +40,37 @@ export default function SignupPage() {
 
   if (done) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4 dark:bg-stone-950">
         <div className="max-w-sm text-center">
           <ChefHat className="mx-auto mb-4 h-10 w-10 text-amber-500" />
-          <h2 className="text-xl font-semibold text-stone-900">Check your email</h2>
-          <p className="mt-2 text-stone-500">We sent a confirmation link to {email}</p>
+          <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-100">Check your email</h2>
+          <p className="mt-2 text-stone-500 dark:text-stone-400">We sent a confirmation link to {email}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4 dark:bg-stone-950">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950">
             <ChefHat className="h-6 w-6 text-amber-500" />
           </div>
-          <h1 className="text-xl font-semibold text-stone-900">Create your account</h1>
+          <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-100">Create your account</h1>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-stone-700">Name</label>
+            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Name</label>
             <Input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" autoFocus />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-stone-700">Email</label>
+            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Email</label>
             <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-stone-700">Password</label>
+            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Password</label>
             <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} />
           </div>
 
@@ -81,9 +81,9 @@ export default function SignupPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-stone-500">
+        <p className="mt-6 text-center text-sm text-stone-500 dark:text-stone-400">
           Already have an account?{' '}
-          <Link href="/auth/login" className="font-medium text-stone-900 hover:underline">
+          <Link href="/auth/login" className="font-medium text-stone-900 hover:underline dark:text-stone-100">
             Sign in
           </Link>
         </p>

@@ -31,22 +31,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4 dark:bg-stone-950">
       <div className="w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-950">
             <ChefHat className="h-6 w-6 text-amber-500" />
           </div>
-          <h1 className="text-xl font-semibold text-stone-900">Welcome back</h1>
+          <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-100">Welcome back</h1>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-stone-700">Email</label>
+            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Email</label>
             <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoFocus />
           </div>
           <div className="space-y-1">
-            <label className="text-sm font-medium text-stone-700">Password</label>
+            <label className="text-sm font-medium text-stone-700 dark:text-stone-300">Password</label>
             <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
 
@@ -57,9 +57,9 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-stone-500">
+        <p className="mt-6 text-center text-sm text-stone-500 dark:text-stone-400">
           No account?{' '}
-          <Link href="/auth/signup" className="font-medium text-stone-900 hover:underline">
+          <Link href="/auth/signup" className="font-medium text-stone-900 hover:underline dark:text-stone-100">
             Sign up
           </Link>
         </p>

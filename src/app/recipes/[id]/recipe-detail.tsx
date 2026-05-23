@@ -155,7 +155,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
       <div className="mb-6 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900 transition-colors dark:text-stone-400 dark:hover:text-stone-100"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -204,13 +204,13 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
         ) : (
           <button
             onClick={() => imageInputRef.current?.click()}
-            className="flex h-[28rem] w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-stone-200 bg-gradient-to-br from-amber-50 via-stone-100 to-stone-200 text-stone-400 transition-colors hover:border-stone-300 hover:text-stone-500"
+            className="flex h-[28rem] w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-stone-200 bg-gradient-to-br from-amber-50 via-stone-100 to-stone-200 text-stone-400 transition-colors hover:border-stone-300 hover:text-stone-500 dark:border-stone-700 dark:from-amber-950 dark:via-stone-800 dark:to-stone-700 dark:text-stone-500 dark:hover:border-stone-600"
           >
             {uploadingImage ? (
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
             ) : (
               <>
-                <ChefHat className="h-10 w-10 text-stone-300" />
+                <ChefHat className="h-10 w-10 text-stone-300 dark:text-stone-600" />
                 <div className="flex items-center gap-1.5 text-sm font-medium">
                   <Camera className="h-4 w-4" />
                   Add a photo
@@ -231,13 +231,13 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
               onChange={e => setTitleValue(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.currentTarget.blur() } }}
               onBlur={saveTitle}
-              className="flex-1 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-2xl font-bold focus:outline-none"
+              className="flex-1 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-2xl font-bold focus:outline-none dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
             />
             <Button size="icon" onClick={saveTitle}><Check className="h-4 w-4" /></Button>
           </div>
         ) : (
           <h1
-            className="text-3xl font-bold text-stone-900 cursor-pointer hover:text-amber-700 transition-colors group"
+            className="text-3xl font-bold text-stone-900 cursor-pointer hover:text-amber-700 transition-colors group dark:text-stone-100"
             onClick={() => setEditingTitle(true)}
           >
             {recipe.title}
@@ -247,7 +247,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
       </div>
 
       {/* Meta row */}
-      <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-stone-500">
+      <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-stone-500 dark:text-stone-400">
         {/* Feeds how many */}
         {editingFeeds ? (
           <div className="flex items-center gap-1.5">
@@ -260,21 +260,21 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
               onChange={e => setFeedsValue(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') { e.currentTarget.blur() } }}
               onBlur={saveFeeds}
-              className="w-14 rounded border border-amber-300 bg-amber-50 px-2 py-0.5 text-sm focus:outline-none"
+              className="w-14 rounded border border-amber-300 bg-amber-50 px-2 py-0.5 text-sm focus:outline-none dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
             />
             <span>people</span>
           </div>
         ) : feedsPrompt ? (
           <button
             onClick={() => setEditingFeeds(true)}
-            className="flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-amber-700 text-xs font-medium hover:bg-amber-100 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-amber-700 text-xs font-medium hover:bg-amber-100 transition-colors dark:bg-amber-950 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-900"
           >
             <Users className="h-3.5 w-3.5" />
             How many does this feed? (tap to set)
           </button>
         ) : (
           <button
-            className="flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-stone-100 transition-colors group"
+            className="flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-stone-100 transition-colors group dark:hover:bg-stone-800"
             onClick={() => setEditingFeeds(true)}
           >
             <Users className="h-4 w-4" />
@@ -331,12 +331,12 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
               }}
               onBlur={() => setTimeout(() => { setAddingTag(false); setTagInput('') }, 150)}
               placeholder="Tag name…"
-              className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs focus:outline-none w-28"
+              className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs focus:outline-none w-28 dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
             />
           ) : (
             <button
               onClick={() => setAddingTag(true)}
-              className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 px-2.5 py-0.5 text-xs text-stone-400 hover:border-stone-400 hover:text-stone-600 transition-colors"
+              className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 px-2.5 py-0.5 text-xs text-stone-400 hover:border-stone-400 hover:text-stone-600 transition-colors dark:border-stone-600 dark:text-stone-500 dark:hover:border-stone-500 dark:hover:text-stone-300"
             >
               <Plus className="h-3 w-3" />
               Add tag
@@ -350,7 +350,7 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
               <button
                 key={t.id}
                 onMouseDown={() => addTag(t.name)}
-                className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-600 hover:bg-amber-100 hover:text-amber-800 transition-colors"
+                className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-600 hover:bg-amber-100 hover:text-amber-800 transition-colors dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-amber-900 dark:hover:text-amber-300"
               >
                 {t.name}
               </button>
@@ -384,18 +384,18 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
               <div className="relative" ref={collectionPickerRef}>
                 <button
                   onClick={() => setShowCollectionPicker(v => !v)}
-                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 px-2.5 py-0.5 text-xs text-stone-400 hover:border-stone-400 hover:text-stone-600 transition-colors"
+                  className="inline-flex items-center gap-1 rounded-full border border-dashed border-stone-300 px-2.5 py-0.5 text-xs text-stone-400 hover:border-stone-400 hover:text-stone-600 transition-colors dark:border-stone-600 dark:text-stone-500 dark:hover:border-stone-500 dark:hover:text-stone-300"
                 >
                   <Plus className="h-3 w-3" />
                   Add to collection
                 </button>
                 {showCollectionPicker && (
-                  <div className="absolute left-0 top-full z-10 mt-1 min-w-[160px] rounded-lg border border-stone-200 bg-white py-1 shadow-lg">
+                  <div className="absolute left-0 top-full z-10 mt-1 min-w-[160px] rounded-lg border border-stone-200 bg-white py-1 shadow-lg dark:border-stone-700 dark:bg-stone-900">
                     {unaddedCollections.map(col => (
                       <button
                         key={col.id}
                         onMouseDown={() => addToCollection(col.id)}
-                        className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors"
+                        className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-stone-700 hover:bg-stone-50 transition-colors dark:text-stone-300 dark:hover:bg-stone-800"
                       >
                         <span>{col.icon}</span>
                         {col.name}
@@ -411,40 +411,40 @@ export function RecipeDetail({ recipe: initial, allCollections, allTags }: Props
 
       {/* Description */}
       {recipe.description && (
-        <p className="mb-8 text-stone-600 leading-relaxed">{recipe.description}</p>
+        <p className="mb-8 text-stone-600 leading-relaxed dark:text-stone-400">{recipe.description}</p>
       )}
 
       {/* Two-column layout: ingredients + instructions */}
       <div className="grid gap-12 md:grid-cols-[5fr_7fr]">
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-stone-900">Ingredients</h2>
+          <h2 className="mb-4 text-lg font-semibold text-stone-900 dark:text-stone-100">Ingredients</h2>
           <IngredientList recipe={recipe} onChangeIngredients={updateIngredients} editable />
         </section>
 
         <section>
-          <h2 className="mb-4 text-lg font-semibold text-stone-900">Instructions</h2>
+          <h2 className="mb-4 text-lg font-semibold text-stone-900 dark:text-stone-100">Instructions</h2>
           <ol className="space-y-5">
             {recipe.instructions.map(step => (
               <li key={step.id} className="flex gap-4">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-sm font-semibold text-stone-600">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-stone-100 text-sm font-semibold text-stone-600 dark:bg-stone-800 dark:text-stone-300">
                   {step.step_number}
                 </span>
-                <p className="text-stone-700 leading-relaxed pt-0.5">{step.text}</p>
+                <p className="text-stone-700 leading-relaxed pt-0.5 dark:text-stone-300">{step.text}</p>
               </li>
             ))}
           </ol>
         </section>
       </div>
 
-      <div className="mt-10 rounded-xl border border-stone-100 bg-stone-50 p-4">
-        <h3 className="mb-2 text-sm font-semibold text-stone-600">Notes</h3>
+      <div className="mt-10 rounded-xl border border-stone-100 bg-stone-50 p-4 dark:border-stone-800 dark:bg-stone-950">
+        <h3 className="mb-2 text-sm font-semibold text-stone-600 dark:text-stone-400">Notes</h3>
         <textarea
           value={recipe.notes ?? ''}
           onChange={e => setRecipe(r => ({ ...r, notes: e.target.value }))}
           onBlur={e => patch({ notes: e.target.value })}
           placeholder="Add any notes about this recipe…"
           rows={3}
-          className="w-full resize-none bg-transparent text-sm text-stone-600 leading-relaxed placeholder:text-stone-300 focus:outline-none"
+          className="w-full resize-none bg-transparent text-sm text-stone-600 leading-relaxed placeholder:text-stone-300 focus:outline-none dark:text-stone-400 dark:placeholder:text-stone-600"
         />
       </div>
     </div>

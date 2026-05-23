@@ -39,14 +39,14 @@ function EditRow({ value, onChange, onSave, onCancel, autoFocusField = 'name' }:
         onChange={e => onChange({ ...value, quantity: e.target.value })}
         onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }}
         placeholder="qty"
-        className="w-12 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs focus:outline-none"
+        className="w-12 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs focus:outline-none dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
       />
       <input
         value={value.unit}
         onChange={e => onChange({ ...value, unit: e.target.value })}
         onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }}
         placeholder="unit"
-        className="w-16 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs focus:outline-none"
+        className="w-16 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs focus:outline-none dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
       />
       <input
         autoFocus={autoFocusField === 'name'}
@@ -54,19 +54,19 @@ function EditRow({ value, onChange, onSave, onCancel, autoFocusField = 'name' }:
         onChange={e => onChange({ ...value, name: e.target.value })}
         onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }}
         placeholder="ingredient name"
-        className="w-32 flex-1 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs focus:outline-none"
+        className="w-32 flex-1 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-xs focus:outline-none dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
       />
       <input
         value={value.notes}
         onChange={e => onChange({ ...value, notes: e.target.value })}
         onKeyDown={e => { if (e.key === 'Enter') onSave(); if (e.key === 'Escape') onCancel() }}
         placeholder="notes"
-        className="w-24 rounded border border-stone-200 bg-white px-1.5 py-0.5 text-xs focus:outline-none"
+        className="w-24 rounded border border-stone-200 bg-white px-1.5 py-0.5 text-xs focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
       />
       <button onClick={onSave} className="flex h-5 w-5 items-center justify-center rounded bg-amber-500 text-white hover:bg-amber-600 transition-colors">
         <Check className="h-3 w-3" />
       </button>
-      <button onClick={onCancel} className="flex h-5 w-5 items-center justify-center rounded border border-stone-200 text-stone-400 hover:text-stone-600 transition-colors">
+      <button onClick={onCancel} className="flex h-5 w-5 items-center justify-center rounded border border-stone-200 text-stone-400 hover:text-stone-600 transition-colors dark:border-stone-700 dark:text-stone-500 dark:hover:text-stone-300">
         <X className="h-3 w-3" />
       </button>
     </div>
@@ -133,23 +133,23 @@ export function IngredientList({ recipe, onChangeIngredients, editable }: Ingred
     <div>
       {/* Serving scaler */}
       <div className="mb-6 flex items-center gap-4">
-        <span className="text-sm font-medium text-stone-600">I want to feed</span>
+        <span className="text-sm font-medium text-stone-600 dark:text-stone-400">I want to feed</span>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setServings(Math.max(1, servings - 1))}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors text-lg leading-none"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors text-lg leading-none dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
           >
             −
           </button>
-          <span className="w-8 text-center text-lg font-semibold text-stone-900">{servings}</span>
+          <span className="w-8 text-center text-lg font-semibold text-stone-900 dark:text-stone-100">{servings}</span>
           <button
             onClick={() => setServings(servings + 1)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors text-lg leading-none"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors text-lg leading-none dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
           >
             +
           </button>
         </div>
-        <span className="text-sm text-stone-400">people</span>
+        <span className="text-sm text-stone-400 dark:text-stone-500">people</span>
         {servings !== originalServings && (
           <button onClick={() => setServings(originalServings)} className="text-xs text-amber-600 underline underline-offset-2">
             reset
@@ -169,7 +169,7 @@ export function IngredientList({ recipe, onChangeIngredients, editable }: Ingred
               key={ingredient.id}
               className={cn(
                 'group flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors',
-                isChecked && !isEditing ? 'opacity-40' : 'hover:bg-stone-50'
+                isChecked && !isEditing ? 'opacity-40' : 'hover:bg-stone-50 dark:hover:bg-stone-800'
               )}
             >
               {isEditing ? (
@@ -186,28 +186,28 @@ export function IngredientList({ recipe, onChangeIngredients, editable }: Ingred
                     onClick={() => toggleCheck(ingredient.id)}
                     className={cn(
                       'flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
-                      isChecked ? 'border-stone-400 bg-stone-400 text-white' : 'border-stone-200 hover:border-stone-400'
+                      isChecked ? 'border-stone-400 bg-stone-400 text-white dark:border-stone-500 dark:bg-stone-500' : 'border-stone-200 hover:border-stone-400 dark:border-stone-700 dark:hover:border-stone-500'
                     )}
                   >
                     {isChecked && <Check className="h-3 w-3" />}
                   </button>
 
-                  <span className={cn('flex-1 text-sm', ingredient.is_primary ? 'font-medium text-stone-900' : 'text-stone-700')}>
+                  <span className={cn('flex-1 text-sm', ingredient.is_primary ? 'font-medium text-stone-900 dark:text-stone-100' : 'text-stone-700 dark:text-stone-300')}>
                     {scaled.quantity}{scaled.unit ? ' ' + scaled.unit : ''} {ingredient.name}
-                    {ingredient.notes && <span className="text-stone-400 font-normal">, {ingredient.notes}</span>}
+                    {ingredient.notes && <span className="text-stone-400 font-normal dark:text-stone-500">, {ingredient.notes}</span>}
                   </span>
 
                   {editable && (
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => startEdit(ingredient)}
-                        className="flex h-5 w-5 items-center justify-center rounded text-stone-400 hover:text-stone-700 transition-colors"
+                        className="flex h-5 w-5 items-center justify-center rounded text-stone-400 hover:text-stone-700 transition-colors dark:text-stone-500 dark:hover:text-stone-300"
                       >
                         <Pencil className="h-3 w-3" />
                       </button>
                       <button
                         onClick={() => deleteIngredient(ingredient.id)}
-                        className="flex h-5 w-5 items-center justify-center rounded text-stone-400 hover:text-red-500 transition-colors"
+                        className="flex h-5 w-5 items-center justify-center rounded text-stone-400 hover:text-red-500 transition-colors dark:text-stone-500"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
@@ -236,7 +236,7 @@ export function IngredientList({ recipe, onChangeIngredients, editable }: Ingred
           ) : (
             <button
               onClick={() => { setEditingId(null); setAdding(true) }}
-              className="flex items-center gap-1.5 px-2 py-1 text-xs text-stone-400 hover:text-stone-600 transition-colors"
+              className="flex items-center gap-1.5 px-2 py-1 text-xs text-stone-400 hover:text-stone-600 transition-colors dark:text-stone-500 dark:hover:text-stone-300"
             >
               <Plus className="h-3.5 w-3.5" />
               Add ingredient

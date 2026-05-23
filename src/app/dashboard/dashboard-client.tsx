@@ -170,10 +170,10 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
             {/* Collections */}
             <div>
               <div className="mb-2 flex items-center justify-between px-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400">Collections</h3>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Collections</h3>
                 <button
                   onClick={() => { setAddingCollection(true); setTimeout(() => newColInputRef.current?.focus(), 0) }}
-                  className="flex h-5 w-5 items-center justify-center rounded text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+                  className="flex h-5 w-5 items-center justify-center rounded text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors dark:text-stone-500 dark:hover:text-stone-300 dark:hover:bg-stone-800"
                   title="New collection"
                 >
                   <Plus className="h-3.5 w-3.5" />
@@ -184,7 +184,7 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                 <button
                   onClick={() => setActiveCollection(null)}
                   className={cn('flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors',
-                    !activeCollection ? 'bg-stone-100 font-medium text-stone-900' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-50'
+                    !activeCollection ? 'bg-stone-100 font-medium text-stone-900 dark:bg-stone-800 dark:text-stone-100' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-50 dark:text-stone-400 dark:hover:text-stone-100 dark:hover:bg-stone-800'
                   )}
                 >
                   <ChefHat className="h-4 w-4" />
@@ -205,7 +205,7 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                           if (e.key === 'Escape') { setRenamingId(null); setRenameValue('') }
                         }}
                         onBlur={() => saveRename(col.id)}
-                        className="flex-1 min-w-0 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-sm focus:outline-none"
+                        className="flex-1 min-w-0 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-sm focus:outline-none dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
                       />
                     </div>
                   ) : (
@@ -213,7 +213,7 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                       <button
                         onClick={() => setActiveCollection(activeCollection === col.id ? null : col.id)}
                         className={cn('flex flex-1 min-w-0 items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors',
-                          activeCollection === col.id ? 'bg-stone-100 font-medium text-stone-900' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-50'
+                          activeCollection === col.id ? 'bg-stone-100 font-medium text-stone-900 dark:bg-stone-800 dark:text-stone-100' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-50 dark:text-stone-400 dark:hover:text-stone-100 dark:hover:bg-stone-800'
                         )}
                       >
                         <span className="shrink-0">{col.icon}</span>
@@ -221,13 +221,13 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                       </button>
                       <button
                         onClick={() => { setRenamingId(col.id); setRenameValue(col.name) }}
-                        className="shrink-0 flex h-6 w-6 items-center justify-center rounded text-stone-300 opacity-0 group-hover/col:opacity-100 hover:text-stone-600 hover:bg-stone-100 transition-colors"
+                        className="shrink-0 flex h-6 w-6 items-center justify-center rounded text-stone-300 opacity-0 group-hover/col:opacity-100 hover:text-stone-600 hover:bg-stone-100 transition-colors dark:text-stone-600 dark:hover:text-stone-300 dark:hover:bg-stone-800"
                       >
                         <Pencil className="h-3 w-3" />
                       </button>
                       <button
                         onClick={() => deleteCollection(col.id)}
-                        className="shrink-0 flex h-6 w-6 items-center justify-center rounded text-stone-300 opacity-0 group-hover/col:opacity-100 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        className="shrink-0 flex h-6 w-6 items-center justify-center rounded text-stone-300 opacity-0 group-hover/col:opacity-100 hover:text-red-500 hover:bg-red-50 transition-colors dark:text-stone-600"
                       >
                         <Trash2 className="h-3 w-3" />
                       </button>
@@ -249,7 +249,7 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                       }}
                       onBlur={() => { if (newCollectionName.trim()) createCollection(); else { setAddingCollection(false); setNewCollectionName('') } }}
                       placeholder="Collection name…"
-                      className="flex-1 min-w-0 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-sm focus:outline-none"
+                      className="flex-1 min-w-0 rounded border border-amber-300 bg-amber-50 px-1.5 py-0.5 text-sm focus:outline-none dark:border-amber-700 dark:bg-amber-950 dark:text-stone-100"
                     />
                   </div>
                 )}
@@ -260,9 +260,9 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
             {usedTags.length > 0 && (
               <div>
                 <div className="mb-2 flex items-center justify-between px-2">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400">Filter by Tag</h3>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Filter by Tag</h3>
                   {activeTags.size > 0 && (
-                    <button onClick={() => setActiveTags(new Set())} className="text-xs text-amber-600 hover:text-amber-700">
+                    <button onClick={() => setActiveTags(new Set())} className="text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400">
                       Clear ({activeTags.size})
                     </button>
                   )}
@@ -275,7 +275,7 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                     value={tagSearch}
                     onChange={e => setTagSearch(e.target.value)}
                     placeholder="Search tags…"
-                    className="w-full rounded-lg border border-stone-200 bg-white py-1.5 pl-7 pr-2.5 text-xs focus:border-stone-300 focus:outline-none"
+                    className="w-full rounded-lg border border-stone-200 bg-white py-1.5 pl-7 pr-2.5 text-xs focus:border-stone-300 focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:placeholder:text-stone-500 dark:focus:border-stone-600"
                   />
                 </div>
 
@@ -284,7 +284,7 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                     {tagSearchResults.length > 0 ? tagSearchResults.map(tag => (
                       <TagChip key={tag.id} tag={tag} active={activeTags.has(tag.id)} dim={activeTags.size > 0} onClick={() => toggleTag(tag.id)} />
                     )) : (
-                      <p className="text-xs text-stone-400">No tags match</p>
+                      <p className="text-xs text-stone-400 dark:text-stone-500">No tags match</p>
                     )}
                   </div>
                 ) : (
@@ -294,7 +294,7 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
                       if (bucketTags.length === 0) return null
                       return (
                         <div key={bucket.key} className="px-2">
-                          <p className="mb-1.5 text-xs font-medium text-stone-400">{bucket.label}</p>
+                          <p className="mb-1.5 text-xs font-medium text-stone-400 dark:text-stone-500">{bucket.label}</p>
                           <div className="flex flex-wrap gap-1.5">
                             {bucketTags.map(tag => (
                               <TagChip key={tag.id} tag={tag} active={activeTags.has(tag.id)} dim={activeTags.size > 0} onClick={() => toggleTag(tag.id)} />
@@ -336,11 +336,11 @@ export function DashboardClient({ initialRecipes, collections: initialCollection
 
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <ChefHat className="mb-4 h-12 w-12 text-stone-200" />
-              <h3 className="text-lg font-medium text-stone-600">
+              <ChefHat className="mb-4 h-12 w-12 text-stone-200 dark:text-stone-700" />
+              <h3 className="text-lg font-medium text-stone-600 dark:text-stone-400">
                 {recipes.length === 0 ? 'Your cookbook is empty' : 'No recipes match'}
               </h3>
-              <p className="mt-1 text-sm text-stone-400">
+              <p className="mt-1 text-sm text-stone-400 dark:text-stone-500">
                 {recipes.length === 0 ? 'Add your first recipe to get started' : 'Try a different search or filter'}
               </p>
               {recipes.length === 0 && (
