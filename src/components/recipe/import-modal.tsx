@@ -60,13 +60,13 @@ export function ImportModal({ onImported, onClose }: ImportModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
-        <div className="border-b border-stone-100 p-6 pb-4">
-          <h2 className="text-lg font-semibold text-stone-900">Import a Recipe</h2>
-          <p className="mt-1 text-sm text-stone-500">Paste a link, upload a PDF, or drop a photo</p>
+      <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl dark:bg-stone-900">
+        <div className="border-b border-stone-100 p-6 pb-4 dark:border-stone-800">
+          <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">Import a Recipe</h2>
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">Paste a link, upload a PDF, or drop a photo</p>
         </div>
 
-        <div className="flex gap-1 border-b border-stone-100 px-6 pt-4">
+        <div className="flex gap-1 border-b border-stone-100 px-6 pt-4 dark:border-stone-800">
           {([['url', Link, 'From URL'], ['file', Upload, 'PDF'], ['image', Image, 'Photo']] as const).map(
             ([key, Icon, label]) => (
               <button
@@ -75,8 +75,8 @@ export function ImportModal({ onImported, onClose }: ImportModalProps) {
                 className={cn(
                   'flex items-center gap-1.5 rounded-t-lg px-4 py-2 text-sm font-medium transition-colors -mb-px border-b-2',
                   tab === key
-                    ? 'border-stone-900 text-stone-900'
-                    : 'border-transparent text-stone-400 hover:text-stone-600'
+                    ? 'border-stone-900 text-stone-900 dark:border-stone-100 dark:text-stone-100'
+                    : 'border-transparent text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -106,7 +106,7 @@ export function ImportModal({ onImported, onClose }: ImportModalProps) {
             <div
               className={cn(
                 'flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-10 transition-colors cursor-pointer',
-                dragOver ? 'border-stone-400 bg-stone-50' : 'border-stone-200 hover:border-stone-300'
+                dragOver ? 'border-stone-400 bg-stone-50 dark:bg-stone-800' : 'border-stone-200 hover:border-stone-300 dark:border-stone-700 dark:hover:border-stone-600'
               )}
               onClick={() => fileRef.current?.click()}
               onDragOver={e => { e.preventDefault(); setDragOver(true) }}
@@ -120,15 +120,15 @@ export function ImportModal({ onImported, onClose }: ImportModalProps) {
             >
               {tab === 'file' ? (
                 <>
-                  <Upload className="h-8 w-8 text-stone-300 mb-3" />
-                  <p className="text-sm font-medium text-stone-600">Drop a PDF here</p>
-                  <p className="text-xs text-stone-400 mt-1">or click to browse</p>
+                  <Upload className="h-8 w-8 text-stone-300 mb-3 dark:text-stone-600" />
+                  <p className="text-sm font-medium text-stone-600 dark:text-stone-400">Drop a PDF here</p>
+                  <p className="text-xs text-stone-400 mt-1 dark:text-stone-500">or click to browse</p>
                 </>
               ) : (
                 <>
-                  <Image className="h-8 w-8 text-stone-300 mb-3" />
-                  <p className="text-sm font-medium text-stone-600">Drop a cookbook photo</p>
-                  <p className="text-xs text-stone-400 mt-1">JPG, PNG, WEBP supported</p>
+                  <Image className="h-8 w-8 text-stone-300 mb-3 dark:text-stone-600" />
+                  <p className="text-sm font-medium text-stone-600 dark:text-stone-400">Drop a cookbook photo</p>
+                  <p className="text-xs text-stone-400 mt-1 dark:text-stone-500">JPG, PNG, WEBP supported</p>
                 </>
               )}
               <input
@@ -142,14 +142,14 @@ export function ImportModal({ onImported, onClose }: ImportModalProps) {
           )}
 
           {error && (
-            <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+            <div className="mt-3 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
             </div>
           )}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-stone-100 px-6 py-4">
+        <div className="flex justify-end gap-2 border-t border-stone-100 px-6 py-4 dark:border-stone-800">
           <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
           {tab === 'url' && (
             <Button onClick={handleUrlImport} disabled={loading || !url.trim()}>
